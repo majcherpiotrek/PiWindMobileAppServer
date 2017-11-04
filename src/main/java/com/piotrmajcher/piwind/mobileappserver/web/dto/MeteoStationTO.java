@@ -1,10 +1,21 @@
-package com.piotrmajcher.piwind.mobileappserver.dto;
+package com.piotrmajcher.piwind.mobileappserver.web.dto;
 
 public class MeteoStationTO {
+	
+	private String id;
 	
 	private String name;
 	
 	private String stationBaseURL;
+	
+	
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
 
 	public String getName() {
 		return name;

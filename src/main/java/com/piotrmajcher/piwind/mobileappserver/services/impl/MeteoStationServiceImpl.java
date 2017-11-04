@@ -13,14 +13,17 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.util.Assert;
+import org.springframework.web.client.RestTemplate;
 
 import com.piotrmajcher.piwind.mobileappserver.domain.MeteoStation;
-import com.piotrmajcher.piwind.mobileappserver.dto.MeteoStationTO;
 import com.piotrmajcher.piwind.mobileappserver.repository.MeteoStationRepository;
 import com.piotrmajcher.piwind.mobileappserver.services.MeteoStationService;
 import com.piotrmajcher.piwind.mobileappserver.services.exceptions.MeteoStationServiceException;
 import com.piotrmajcher.piwind.mobileappserver.util.EntityAndTOConverter;
 import com.piotrmajcher.piwind.mobileappserver.util.impl.MeteoStationEntityConverter;
+import com.piotrmajcher.piwind.mobileappserver.web.dto.MeteoStationTO;
+import com.piotrmajcher.piwind.mobileappserver.web.dto.TemperatureTO;
+import com.piotrmajcher.piwind.mobileappserver.web.dto.WindSpeedTO;
 
 @Service
 public class MeteoStationServiceImpl implements MeteoStationService{
@@ -30,14 +33,18 @@ public class MeteoStationServiceImpl implements MeteoStationService{
 	private static final String REGISTER_STATION_NULL_ARG_ERROR = "Failed to register new station - passed argument is null.";
 	private static final String REGISTRATION_EXCEPTION_OCCURED = "Exception occurred while trying to register new meteo station: ";
 	private static final String DUPLICATE_STATION_NAME_ERROR = "A meteo station with this name already exists. Please choose another name.";
+	private static final String STATION_NOT_FOUND = "Meteo station with specified id not found";
 	
 	private final MeteoStationRepository meteoStationRepository;
 	private final EntityAndTOConverter<MeteoStation, MeteoStationTO> converter;
+	
+	private final RestTemplate restTemplate;
 	
 	@Autowired
 	public MeteoStationServiceImpl(MeteoStationRepository meteoStationRepository) {
 		this.meteoStationRepository = meteoStationRepository;
 		this.converter = new MeteoStationEntityConverter();
+		this.restTemplate = new RestTemplate();
 	}
 	
 	@Override
@@ -85,5 +92,20 @@ public class MeteoStationServiceImpl implements MeteoStationService{
 	@Override
 	public List<MeteoStationTO> getAllStations() {
 		return converter.entityToTransferObject(meteoStationRepository.findAll());
+	}
+
+	@Override
+	public TemperatureTO getLatestTemperatureMeasurementFromStation(String stationId) throws MeteoStationServiceException {
+		MeteoStation station = meteoStationRepository.findById(UUID.fromString(stationId));
+		if (station == null) {
+			throw new MeteoStationServiceException(STATION_NOT_FOUND);
+		}
+		return restTemplate.getForObject(station.getStationBaseURL() + "/temperature/last-external", TemperatureTO.class);
+	}
+
+	@Override
+	public WindSpeedTO getLatestWindSpeedMeasurementFromStation(String stationId) {
+		MeteoStation station = meteoStationRepository.findById(UUID.fromString(stationId));
+		return restTemplate.getForObject(station.getStationBaseURL() + "/windspeed/last-measurement", WindSpeedTO.class);
 	}
 }

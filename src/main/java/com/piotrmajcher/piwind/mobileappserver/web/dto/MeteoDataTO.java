@@ -1,4 +1,4 @@
-package com.piotrmajcher.piwind.mobileappserver.dto;
+package com.piotrmajcher.piwind.mobileappserver.web.dto;
 
 public class MeteoDataTO {
 	

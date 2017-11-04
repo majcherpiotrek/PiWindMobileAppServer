@@ -6,8 +6,8 @@ import java.util.List;
 import org.springframework.util.Assert;
 
 import com.piotrmajcher.piwind.mobileappserver.domain.MeteoStation;
-import com.piotrmajcher.piwind.mobileappserver.dto.MeteoStationTO;
 import com.piotrmajcher.piwind.mobileappserver.util.EntityAndTOConverter;
+import com.piotrmajcher.piwind.mobileappserver.web.dto.MeteoStationTO;
 
 public class MeteoStationEntityConverter implements EntityAndTOConverter<MeteoStation, MeteoStationTO>{
 
@@ -18,6 +18,7 @@ public class MeteoStationEntityConverter implements EntityAndTOConverter<MeteoSt
 			to = new MeteoStationTO();
 			to.setName(entity.getName());
 			to.setStationBaseURL(entity.getStationBaseURL());
+			to.setId(entity.getId().toString());
 		}
 		return to;
 	}
