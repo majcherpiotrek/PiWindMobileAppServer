@@ -10,9 +10,11 @@ import javax.validation.ConstraintViolationException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.util.Assert;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import com.piotrmajcher.piwind.mobileappserver.domain.MeteoStation;
@@ -95,17 +97,39 @@ public class MeteoStationServiceImpl implements MeteoStationService{
 	}
 
 	@Override
-	public TemperatureTO getLatestTemperatureMeasurementFromStation(String stationId) throws MeteoStationServiceException {
-		MeteoStation station = meteoStationRepository.findById(UUID.fromString(stationId));
+	public TemperatureTO getLatestTemperatureMeasurementFromStation(UUID stationId) throws MeteoStationServiceException {
+		MeteoStation station = meteoStationRepository.findById(stationId);
 		if (station == null) {
 			throw new MeteoStationServiceException(STATION_NOT_FOUND);
 		}
-		return restTemplate.getForObject(station.getStationBaseURL() + "/temperature/last-external", TemperatureTO.class);
+		
+		TemperatureTO temperatureTO = null;
+		
+		try {
+			temperatureTO =	restTemplate.getForObject(station.getStationBaseURL() + "/temperature/last-external", TemperatureTO.class);
+			Assert.notNull(temperatureTO, "Failed to fetch data");
+		} catch (Exception e) {
+			throw new MeteoStationServiceException(e.getMessage());
+		}
+		
+		return temperatureTO;
 	}
 
 	@Override
-	public WindSpeedTO getLatestWindSpeedMeasurementFromStation(String stationId) {
-		MeteoStation station = meteoStationRepository.findById(UUID.fromString(stationId));
-		return restTemplate.getForObject(station.getStationBaseURL() + "/windspeed/last-measurement", WindSpeedTO.class);
+	public WindSpeedTO getLatestWindSpeedMeasurementFromStation(UUID stationId) throws MeteoStationServiceException {
+		MeteoStation station = meteoStationRepository.findById(stationId);
+		if (station == null) {
+			throw new MeteoStationServiceException(STATION_NOT_FOUND);
+		}
+		
+		WindSpeedTO windSpeedTO = null;
+		
+		try {
+			windSpeedTO = restTemplate.getForObject(station.getStationBaseURL() + "/windspeed/last-measurement", WindSpeedTO.class);
+			Assert.notNull(windSpeedTO, "Failed to fetch data");
+		} catch (Exception e) {
+			throw new MeteoStationServiceException(e.getMessage());
+		}
+		return windSpeedTO;
 	}
 }

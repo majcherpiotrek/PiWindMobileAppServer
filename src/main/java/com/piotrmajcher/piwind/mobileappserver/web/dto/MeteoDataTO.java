@@ -5,6 +5,12 @@ public class MeteoDataTO {
 	private double temperature;
 	
 	private double windSpeed;
+	
+	public MeteoDataTO(double temperature, double windSpeed) {
+		super();
+		this.temperature = temperature;
+		this.windSpeed = windSpeed;
+	}
 
 	public double getTemperature() {
 		return temperature;

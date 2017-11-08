@@ -60,7 +60,8 @@ public class MeteoStationController {
 	public ResponseEntity<TemperatureTO> getLastTemperatureMeasurementFromStation(@PathVariable String stationId) {
 		TemperatureTO to;
 		try {
-			to = meteoStationService.getLatestTemperatureMeasurementFromStation(stationId);
+			UUID uuid = UUID.fromString(stationId);
+			to = meteoStationService.getLatestTemperatureMeasurementFromStation(uuid);
 			return new ResponseEntity<TemperatureTO>(to, HttpStatus.OK);
 		} catch (MeteoStationServiceException e) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);

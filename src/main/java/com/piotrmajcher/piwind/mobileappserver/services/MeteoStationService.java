@@ -15,7 +15,7 @@ public interface MeteoStationService {
 	
 	List<MeteoStationTO> getAllStations();
 	
-	TemperatureTO getLatestTemperatureMeasurementFromStation(String stationId) throws MeteoStationServiceException;
+	TemperatureTO getLatestTemperatureMeasurementFromStation(UUID stationId) throws MeteoStationServiceException;
 	
-	WindSpeedTO getLatestWindSpeedMeasurementFromStation(String stationId);
+	WindSpeedTO getLatestWindSpeedMeasurementFromStation(UUID stationId) throws MeteoStationServiceException;
 }
