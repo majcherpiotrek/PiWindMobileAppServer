@@ -27,4 +27,9 @@ public class MeteoDataTO {
 	public void setWindSpeed(double windSpeed) {
 		this.windSpeed = windSpeed;
 	}
+
+	@Override
+	public String toString() {
+		return "MeteoDataTO [temperature=" + temperature + ", windSpeed=" + windSpeed + "]";
+	}
 }
