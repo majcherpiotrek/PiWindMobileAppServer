@@ -23,6 +23,7 @@ import com.piotrmajcher.piwind.mobileappserver.services.MeteoStationService;
 import com.piotrmajcher.piwind.mobileappserver.services.exceptions.MeteoStationServiceException;
 import com.piotrmajcher.piwind.mobileappserver.util.EntityAndTOConverter;
 import com.piotrmajcher.piwind.mobileappserver.util.impl.MeteoStationEntityConverter;
+import com.piotrmajcher.piwind.mobileappserver.web.dto.MeteoDataTO;
 import com.piotrmajcher.piwind.mobileappserver.web.dto.MeteoStationTO;
 import com.piotrmajcher.piwind.mobileappserver.web.dto.TemperatureTO;
 import com.piotrmajcher.piwind.mobileappserver.web.dto.WindSpeedTO;
@@ -37,6 +38,7 @@ public class MeteoStationServiceImpl implements MeteoStationService{
 	private static final String DUPLICATE_STATION_NAME_ERROR = "A meteo station with this name already exists. Please choose another name.";
 	private static final String STATION_NOT_FOUND = "Meteo station with specified id not found";
 	
+	private static final String LAST_METEO_DATA_URL = "/meteo/last";
 	private final MeteoStationRepository meteoStationRepository;
 	private final EntityAndTOConverter<MeteoStation, MeteoStationTO> converter;
 	
@@ -95,41 +97,23 @@ public class MeteoStationServiceImpl implements MeteoStationService{
 	public List<MeteoStationTO> getAllStations() {
 		return converter.entityToTransferObject(meteoStationRepository.findAll());
 	}
+	
+	
 
 	@Override
-	public TemperatureTO getLatestTemperatureMeasurementFromStation(UUID stationId) throws MeteoStationServiceException {
+	public MeteoDataTO getLatestMeteoData(UUID stationId) throws MeteoStationServiceException {
 		MeteoStation station = meteoStationRepository.findById(stationId);
 		if (station == null) {
 			throw new MeteoStationServiceException(STATION_NOT_FOUND);
 		}
 		
-		TemperatureTO temperatureTO = null;
-		
+		MeteoDataTO meteoDataTO = null;
 		try {
-			temperatureTO =	restTemplate.getForObject(station.getStationBaseURL() + "/temperature/last-external", TemperatureTO.class);
-			Assert.notNull(temperatureTO, "Failed to fetch data");
+			meteoDataTO =	restTemplate.getForObject(station.getStationBaseURL() + LAST_METEO_DATA_URL, MeteoDataTO.class);
+			Assert.notNull(meteoDataTO, "Failed to fetch data");
 		} catch (Exception e) {
 			throw new MeteoStationServiceException(e.getMessage());
 		}
-		
-		return temperatureTO;
-	}
-
-	@Override
-	public WindSpeedTO getLatestWindSpeedMeasurementFromStation(UUID stationId) throws MeteoStationServiceException {
-		MeteoStation station = meteoStationRepository.findById(stationId);
-		if (station == null) {
-			throw new MeteoStationServiceException(STATION_NOT_FOUND);
-		}
-		
-		WindSpeedTO windSpeedTO = null;
-		
-		try {
-			windSpeedTO = restTemplate.getForObject(station.getStationBaseURL() + "/windspeed/last-measurement", WindSpeedTO.class);
-			Assert.notNull(windSpeedTO, "Failed to fetch data");
-		} catch (Exception e) {
-			throw new MeteoStationServiceException(e.getMessage());
-		}
-		return windSpeedTO;
+		return meteoDataTO;
 	}
 }

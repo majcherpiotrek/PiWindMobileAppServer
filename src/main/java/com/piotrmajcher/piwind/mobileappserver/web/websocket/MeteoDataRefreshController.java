@@ -1,5 +1,8 @@
 package com.piotrmajcher.piwind.mobileappserver.web.websocket;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
@@ -17,6 +20,7 @@ import com.piotrmajcher.piwind.mobileappserver.events.listeners.MeteoDataUpdateA
 import com.piotrmajcher.piwind.mobileappserver.events.listeners.MeteoDataUpdatePublishEventListener;
 import com.piotrmajcher.piwind.mobileappserver.services.MeteoStationService;
 import com.piotrmajcher.piwind.mobileappserver.web.dto.MeteoDataTO;
+import com.piotrmajcher.piwind.mobileappserver.web.dto.MeteoDataTOAndroid;
 
 
 @Controller
@@ -52,6 +56,14 @@ public class MeteoDataRefreshController {
 
 	private void fireUpdate(MeteoDataTO meteoData) {
 		logger.info("Sending update");
-		template.convertAndSend("/update/updater-url", meteoData);
+		MeteoDataTOAndroid meteoDataTOAndroid = new MeteoDataTOAndroid();
+		meteoDataTOAndroid.setTemperature(meteoData.getTemperature());
+		meteoDataTOAndroid.setWindSpeed(meteoData.getWindSpeed());
+		meteoDataTOAndroid.setDateTime(convertLocalDateTimeToDate(meteoData.getDateTime()));
+		template.convertAndSend("/update/updater-url", meteoDataTOAndroid);
+	}
+	
+	private Date convertLocalDateTimeToDate(LocalDateTime localDateTime) {
+		return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
 	}
 }

@@ -54,17 +54,4 @@ public class MeteoStationController {
 	public ResponseEntity<List<MeteoStationTO>> getAllMeteoStations() {
 		return new ResponseEntity<> (meteoStationService.getAllStations(), HttpStatus.OK);
 	}
-	
-	@GetMapping("/temperature/last/{stationId}")
-	@CrossOrigin
-	public ResponseEntity<TemperatureTO> getLastTemperatureMeasurementFromStation(@PathVariable String stationId) {
-		TemperatureTO to;
-		try {
-			UUID uuid = UUID.fromString(stationId);
-			to = meteoStationService.getLatestTemperatureMeasurementFromStation(uuid);
-			return new ResponseEntity<TemperatureTO>(to, HttpStatus.OK);
-		} catch (MeteoStationServiceException e) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
-	}
 }

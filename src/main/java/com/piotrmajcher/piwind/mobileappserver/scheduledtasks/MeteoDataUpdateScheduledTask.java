@@ -38,9 +38,8 @@ public class MeteoDataUpdateScheduledTask {
 			for (MeteoStationTO station : stationsList) {
 				try {
 					UUID stationId = station.getId();
-					TemperatureTO temperatureTO = meteoStationService.getLatestTemperatureMeasurementFromStation(stationId);
-					WindSpeedTO windSpeedTO = meteoStationService.getLatestWindSpeedMeasurementFromStation(stationId);
-					MeteoDataTO meteoData = new MeteoDataTO(temperatureTO.getTemperatureCelsius(), windSpeedTO.getWindSpeedMPS());
+					MeteoDataTO meteoData = meteoStationService.getLatestMeteoData(stationId);
+					logger.info("Received meteo data: " + (meteoData != null ? meteoData.toString() : "null"));
 					meteoDataUpdateEventPublisher.publishMeteoDataUpdateEvent(stationId, meteoData);
 				} catch(MeteoStationServiceException e) {
 					logger.error("Failed to update meteo data: " + e.getMessage());
