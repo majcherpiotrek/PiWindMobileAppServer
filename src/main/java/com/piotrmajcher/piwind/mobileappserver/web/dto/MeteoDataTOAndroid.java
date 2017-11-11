@@ -2,8 +2,6 @@ package com.piotrmajcher.piwind.mobileappserver.web.dto;
 
 import java.util.Date;
 
-import com.piotrmajcher.piwind.mobileappserver.enums.WindDirection;
-
 public class MeteoDataTOAndroid {
 	
 	private double temperature;
@@ -12,7 +10,11 @@ public class MeteoDataTOAndroid {
 	
 	private Date dateTime;
 	
-	private WindDirection windDirection;
+	private String windDirectionDescription;
+	
+	private String beaufortCategoryDescription;
+	
+	private String temperatureConditionsDescription;
 	
 	public double getTemperature() {
 		return temperature;
@@ -38,17 +40,35 @@ public class MeteoDataTOAndroid {
 		this.dateTime = dateTime;
 	}
 	
-	public WindDirection getWindDirection() {
-		return windDirection;
+	public String getWindDirectionDescription() {
+		return windDirectionDescription;
 	}
 
-	public void setWindDirection(WindDirection windDirection) {
-		this.windDirection = windDirection;
+	public void setWindDirectionDescription(String windDirectionDescription) {
+		this.windDirectionDescription = windDirectionDescription;
+	}
+
+	public String getBeaufortCategoryDescription() {
+		return beaufortCategoryDescription;
+	}
+
+	public void setBeaufortCategoryDescription(String beaufortCategoryDescription) {
+		this.beaufortCategoryDescription = beaufortCategoryDescription;
+	}
+
+	public String getTemperatureConditionsDescription() {
+		return temperatureConditionsDescription;
+	}
+
+	public void setTemperatureConditionsDescription(String temperatureConditionsDescription) {
+		this.temperatureConditionsDescription = temperatureConditionsDescription;
 	}
 
 	@Override
 	public String toString() {
 		return "MeteoDataTOAndroid [temperature=" + temperature + ", windSpeed=" + windSpeed + ", dateTime=" + dateTime
-				+ ", windDirection=" + windDirection + "]";
+				+ ", windDirectionDescription=" + windDirectionDescription + ", beaufortCategoryDescription="
+				+ beaufortCategoryDescription + ", temperatureConditionsDescription=" + temperatureConditionsDescription
+				+ "]";
 	}
 }

@@ -112,4 +112,14 @@ public class MeteoStationServiceImpl implements MeteoStationService{
 		}
 		return meteoDataTO;
 	}
+
+	@Override
+	public MeteoStationTO getStation(UUID stationId) throws MeteoStationServiceException {
+		MeteoStation meteoStation = meteoStationRepository.findById(stationId);
+		if (meteoStation == null) {
+			throw new MeteoStationServiceException(STATION_NOT_FOUND);
+		}
+		
+		return converter.entityToTransferObject(meteoStation);
+	}
 }

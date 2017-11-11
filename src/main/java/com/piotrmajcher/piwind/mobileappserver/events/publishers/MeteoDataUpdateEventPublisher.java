@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import com.piotrmajcher.piwind.mobileappserver.events.OnMeteoDataUpdateReceivedEvent;
 import com.piotrmajcher.piwind.mobileappserver.web.dto.MeteoDataTO;
+import com.piotrmajcher.piwind.mobileappserver.web.dto.MeteoDataTOAndroid;
 
 @Component
 public class MeteoDataUpdateEventPublisher {
@@ -21,7 +22,7 @@ public class MeteoDataUpdateEventPublisher {
 		this.applicationEventPublisher = applicationEventPublisher;
 	}
 	
-	public void publishMeteoDataUpdateEvent(final UUID stationId, final MeteoDataTO updatedData) {
+	public void publishMeteoDataUpdateEvent(final UUID stationId, final MeteoDataTOAndroid updatedData) {
 		logger.info("Publishing new update data: " + updatedData.toString());
 		OnMeteoDataUpdateReceivedEvent updateEvent = new OnMeteoDataUpdateReceivedEvent(this, stationId, updatedData);
 		applicationEventPublisher.publishEvent(updateEvent);

@@ -12,13 +12,13 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 import com.piotrmajcher.piwind.mobileappserver.events.OnMeteoDataUpdateReceivedEvent;
-import com.piotrmajcher.piwind.mobileappserver.web.dto.MeteoDataTO;
+import com.piotrmajcher.piwind.mobileappserver.web.dto.MeteoDataTOAndroid;
 
 @Component
 public class MeteoDataUpdateApplicationListener implements ApplicationListener<OnMeteoDataUpdateReceivedEvent> {
 	private static final Logger logger = Logger.getLogger(MeteoDataUpdateApplicationListener.class);
 	private List<MeteoDataUpdatePublishEventListener> listeners;
-	private Map<UUID, MeteoDataTO> latestMeasurementsMap;
+	private Map<UUID, MeteoDataTOAndroid> latestMeasurementsMap;
 	
 	@Autowired
 	public MeteoDataUpdateApplicationListener() {
@@ -29,7 +29,7 @@ public class MeteoDataUpdateApplicationListener implements ApplicationListener<O
 	@Override
 	public void onApplicationEvent(OnMeteoDataUpdateReceivedEvent event) {
 		logger.info("Intercepted a meteo data update event for station with id " + event.getStationId());
-		MeteoDataTO updatedData = event.getUpdatedData();
+		MeteoDataTOAndroid updatedData = event.getUpdatedData();
 		latestMeasurementsMap.put(event.getStationId(), updatedData);
 		
 		for (MeteoDataUpdatePublishEventListener listener : listeners) {
@@ -41,7 +41,7 @@ public class MeteoDataUpdateApplicationListener implements ApplicationListener<O
 	
 	public void addMeteoDataUpdatePublishEventListener(MeteoDataUpdatePublishEventListener listener) {
 			this.listeners.add(listener);
-			MeteoDataTO latestMeasurement = latestMeasurementsMap.get(listener.getListeningStationId());
+			MeteoDataTOAndroid latestMeasurement = latestMeasurementsMap.get(listener.getListeningStationId());
 			if (latestMeasurement != null) {
 				listener.onMeteoDataUpdatedPublishedEvent(latestMeasurement);
 			}

@@ -13,5 +13,7 @@ public interface MeteoStationService {
 	
 	List<MeteoStationTO> getAllStations();
 	
+	MeteoStationTO getStation(UUID stationId) throws MeteoStationServiceException;
+	
 	MeteoDataTO getLatestMeteoData(UUID stationId) throws MeteoStationServiceException;
 }
