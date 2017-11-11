@@ -13,8 +13,6 @@ import com.piotrmajcher.piwind.mobileappserver.services.MeteoStationService;
 import com.piotrmajcher.piwind.mobileappserver.services.exceptions.MeteoStationServiceException;
 import com.piotrmajcher.piwind.mobileappserver.web.dto.MeteoDataTO;
 import com.piotrmajcher.piwind.mobileappserver.web.dto.MeteoStationTO;
-import com.piotrmajcher.piwind.mobileappserver.web.dto.TemperatureTO;
-import com.piotrmajcher.piwind.mobileappserver.web.dto.WindSpeedTO;
 
 @Component
 public class MeteoDataUpdateScheduledTask {
@@ -29,7 +27,6 @@ public class MeteoDataUpdateScheduledTask {
 		this.meteoDataUpdateEventPublisher = meteoDataUpdateEventPublisher;
 	}
 	
-	// TODO the rate should be the synced with piwind refresh rate
 	@Scheduled(fixedRate = 10000)
 	private void getAndPublishMeteoDataUpdates() {
 		List<MeteoStationTO> stationsList = meteoStationService.getAllStations();
@@ -42,7 +39,7 @@ public class MeteoDataUpdateScheduledTask {
 					logger.info("Received meteo data: " + (meteoData != null ? meteoData.toString() : "null"));
 					meteoDataUpdateEventPublisher.publishMeteoDataUpdateEvent(stationId, meteoData);
 				} catch(MeteoStationServiceException e) {
-					logger.error("Failed to update meteo data: " + e.getMessage());
+					logger.error("Failed to update meteo data from station with id " + station.getId() + ":"  + e.getMessage());
 				}
 			}
 		}

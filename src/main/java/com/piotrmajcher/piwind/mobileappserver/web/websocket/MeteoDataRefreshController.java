@@ -45,11 +45,14 @@ public class MeteoDataRefreshController {
 		meteoDataUpdateListener.addMeteoDataUpdatePublishEventListener(new MeteoDataUpdatePublishEventListener() {
 			
 			@Override
-			public void onMeteoDataUpdatedPublishedEvent(OnMeteoDataUpdateReceivedEvent event) {
-				logger.info("Received the meteo data update event in controller. Update for station with id " + event.getStationId());
-				if (event.getStationId().equals(stationId)) {
-					fireUpdate(event.getUpdatedData());
-				}
+			public void onMeteoDataUpdatedPublishedEvent(MeteoDataTO updatedData) {
+				logger.info("Received the meteo data update event in controller : " + updatedData);
+				fireUpdate(updatedData);
+			}
+
+			@Override
+			public UUID getListeningStationId() {
+				return stationId;
 			}
 		});
 	}
