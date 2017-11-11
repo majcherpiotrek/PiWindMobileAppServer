@@ -9,19 +9,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.piotrmajcher.piwind.mobileappserver.domain.MeteoStation;
 import com.piotrmajcher.piwind.mobileappserver.services.MeteoStationService;
 import com.piotrmajcher.piwind.mobileappserver.services.exceptions.MeteoStationServiceException;
-import com.piotrmajcher.piwind.mobileappserver.util.EntityAndTOConverter;
-import com.piotrmajcher.piwind.mobileappserver.util.impl.MeteoStationEntityConverter;
 import com.piotrmajcher.piwind.mobileappserver.web.dto.MeteoStationTO;
-import com.piotrmajcher.piwind.mobileappserver.web.dto.TemperatureTO;
 
 @RestController
 @RequestMapping("/stations")

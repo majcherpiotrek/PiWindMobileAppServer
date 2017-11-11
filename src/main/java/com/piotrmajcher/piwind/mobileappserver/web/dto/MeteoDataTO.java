@@ -6,12 +6,16 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.piotrmajcher.piwind.mobileappserver.enums.WindDirection;
+
 
 public class MeteoDataTO {
 	
-	private double temperature;
+private double temperature;
 	
 	private double windSpeed;
+	
+	private WindDirection windDirection;
 	
 	@JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
@@ -33,6 +37,14 @@ public class MeteoDataTO {
 		this.windSpeed = windSpeed;
 	}
 	
+	public WindDirection getWindDirection() {
+		return windDirection;
+	}
+
+	public void setWindDirection(WindDirection windDirection) {
+		this.windDirection = windDirection;
+	}
+
 	public LocalDateTime getDateTime() {
 		return dateTime;
 	}
@@ -43,6 +55,7 @@ public class MeteoDataTO {
 
 	@Override
 	public String toString() {
-		return "MeteoDataTO [temperature=" + temperature + ", windSpeed=" + windSpeed + ", dateTime=" + dateTime + "]";
+		return "MeteoDataTO [temperature=" + temperature + ", windSpeed=" + windSpeed + ", windDirection="
+				+ windDirection + ", dateTime=" + dateTime + "]";
 	}
 }

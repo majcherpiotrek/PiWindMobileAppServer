@@ -30,6 +30,9 @@ public class MeteoStationEntityConverter implements EntityAndTOConverter<MeteoSt
 			entity = new MeteoStation();
 			entity.setName(to.getName());
 			entity.setStationBaseURL(to.getStationBaseURL());
+			entity.setBeachFacingDirection(to.getBeachFacingDirection());
+			entity.setBestWindDirections(to.getBestWindDirections());
+			entity.setDescription(to.getDescription());
 		}
 		return entity;
 	}

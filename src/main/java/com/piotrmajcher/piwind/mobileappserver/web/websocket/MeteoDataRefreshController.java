@@ -59,11 +59,15 @@ public class MeteoDataRefreshController {
 
 	private void fireUpdate(MeteoDataTO meteoData) {
 		logger.info("Sending update");
+		template.convertAndSend("/update/updater-url", createMeteoDataTOAndroid(meteoData));
+	}
+	private MeteoDataTOAndroid createMeteoDataTOAndroid(MeteoDataTO meteoData) {
 		MeteoDataTOAndroid meteoDataTOAndroid = new MeteoDataTOAndroid();
 		meteoDataTOAndroid.setTemperature(meteoData.getTemperature());
 		meteoDataTOAndroid.setWindSpeed(meteoData.getWindSpeed());
 		meteoDataTOAndroid.setDateTime(convertLocalDateTimeToDate(meteoData.getDateTime()));
-		template.convertAndSend("/update/updater-url", meteoDataTOAndroid);
+		meteoDataTOAndroid.setWindDirection(meteoData.getWindDirection());
+		return meteoDataTOAndroid;
 	}
 	
 	private Date convertLocalDateTimeToDate(LocalDateTime localDateTime) {

@@ -10,11 +10,9 @@ import javax.validation.ConstraintViolationException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.util.Assert;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import com.piotrmajcher.piwind.mobileappserver.domain.MeteoStation;
@@ -25,8 +23,6 @@ import com.piotrmajcher.piwind.mobileappserver.util.EntityAndTOConverter;
 import com.piotrmajcher.piwind.mobileappserver.util.impl.MeteoStationEntityConverter;
 import com.piotrmajcher.piwind.mobileappserver.web.dto.MeteoDataTO;
 import com.piotrmajcher.piwind.mobileappserver.web.dto.MeteoStationTO;
-import com.piotrmajcher.piwind.mobileappserver.web.dto.TemperatureTO;
-import com.piotrmajcher.piwind.mobileappserver.web.dto.WindSpeedTO;
 
 @Service
 public class MeteoStationServiceImpl implements MeteoStationService{
