@@ -28,7 +28,6 @@ public class MeteoDataUpdateApplicationListener implements ApplicationListener<O
 	
 	@Override
 	public void onApplicationEvent(OnMeteoDataUpdateReceivedEvent event) {
-		logger.info("Intercepted a meteo data update event for station with id " + event.getStationId());
 		MeteoDataTOAndroid updatedData = event.getUpdatedData();
 		latestMeasurementsMap.put(event.getStationId(), updatedData);
 		

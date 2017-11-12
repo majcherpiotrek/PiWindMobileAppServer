@@ -35,6 +35,7 @@ public class MeteoStationServiceImpl implements MeteoStationService{
 	private static final String STATION_NOT_FOUND = "Meteo station with specified id not found";
 	
 	private static final String LAST_METEO_DATA_URL = "/meteo/last";
+	private static final String LAST_SNAPSHOT = "/webcam/latest-snap";
 	private final MeteoStationRepository meteoStationRepository;
 	private final EntityAndTOConverter<MeteoStation, MeteoStationTO> converter;
 	
@@ -97,7 +98,7 @@ public class MeteoStationServiceImpl implements MeteoStationService{
 	
 
 	@Override
-	public MeteoDataTO getLatestMeteoData(UUID stationId) throws MeteoStationServiceException {
+	public MeteoDataTO getLatestMeteoDataFromStation(UUID stationId) throws MeteoStationServiceException {
 		MeteoStation station = meteoStationRepository.findById(stationId);
 		if (station == null) {
 			throw new MeteoStationServiceException(STATION_NOT_FOUND);
@@ -121,5 +122,22 @@ public class MeteoStationServiceImpl implements MeteoStationService{
 		}
 		
 		return converter.entityToTransferObject(meteoStation);
+	}
+
+	@Override
+	public byte[] getLatestSnapshotFromStation(UUID stationId) throws MeteoStationServiceException {
+		MeteoStation station = meteoStationRepository.findById(stationId);
+		if (station == null) {
+			throw new MeteoStationServiceException(STATION_NOT_FOUND);
+		}
+		
+		byte[] snapshot = null;
+		try {
+			snapshot =	restTemplate.getForObject(station.getStationBaseURL() + LAST_SNAPSHOT, byte[].class);
+			Assert.notNull(snapshot, "Failed to fetch data");
+		} catch (Exception e) {
+			throw new MeteoStationServiceException(e.getMessage());
+		}
+		return snapshot;
 	}
 }

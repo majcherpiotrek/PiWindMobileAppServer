@@ -2,6 +2,9 @@ package com.piotrmajcher.piwind.mobileappserver.web.dto;
 
 import java.util.Date;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 public class MeteoDataTOAndroid {
 	
 	private double temperature;
@@ -66,9 +69,7 @@ public class MeteoDataTOAndroid {
 
 	@Override
 	public String toString() {
-		return "MeteoDataTOAndroid [temperature=" + temperature + ", windSpeed=" + windSpeed + ", dateTime=" + dateTime
-				+ ", windDirectionDescription=" + windDirectionDescription + ", beaufortCategoryDescription="
-				+ beaufortCategoryDescription + ", temperatureConditionsDescription=" + temperatureConditionsDescription
-				+ "]";
+		Gson gson = new GsonBuilder().create();
+		return gson.toJson(this);
 	}
 }
