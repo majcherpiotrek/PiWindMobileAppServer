@@ -14,6 +14,8 @@ import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.hibernate.validator.constraints.URL;
 
+import com.piotrmajcher.piwind.mobileappserver.enums.WindDirection;
+
 @Entity
 public class MeteoStation {
 	
@@ -29,7 +31,16 @@ public class MeteoStation {
 	@Column(unique = true)
 	@Length(min = 3, max = 100, message = "The station's name must be between 3 and 100 characters.")
 	private String name;
-
+	
+	@Column
+	private String description;
+	
+	@Column
+	private WindDirection beachFacingDirection;
+	
+	@Column
+	private String[] bestWindDirections;
+	
 	public UUID getId() {
 		return id;
 	}
@@ -48,5 +59,29 @@ public class MeteoStation {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public WindDirection getBeachFacingDirection() {
+		return beachFacingDirection;
+	}
+
+	public void setBeachFacingDirection(WindDirection beachFacingDirection) {
+		this.beachFacingDirection = beachFacingDirection;
+	}
+
+	public String[] getBestWindDirections() {
+		return bestWindDirections;
+	}
+
+	public void setBestWindDirections(String[] bestWindDirections) {
+		this.bestWindDirections = bestWindDirections;
 	}
 }

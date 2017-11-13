@@ -10,11 +10,9 @@ import javax.validation.ConstraintViolationException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.util.Assert;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import com.piotrmajcher.piwind.mobileappserver.domain.MeteoStation;
@@ -25,8 +23,6 @@ import com.piotrmajcher.piwind.mobileappserver.util.EntityAndTOConverter;
 import com.piotrmajcher.piwind.mobileappserver.util.impl.MeteoStationEntityConverter;
 import com.piotrmajcher.piwind.mobileappserver.web.dto.MeteoDataTO;
 import com.piotrmajcher.piwind.mobileappserver.web.dto.MeteoStationTO;
-import com.piotrmajcher.piwind.mobileappserver.web.dto.TemperatureTO;
-import com.piotrmajcher.piwind.mobileappserver.web.dto.WindSpeedTO;
 
 @Service
 public class MeteoStationServiceImpl implements MeteoStationService{
@@ -39,6 +35,7 @@ public class MeteoStationServiceImpl implements MeteoStationService{
 	private static final String STATION_NOT_FOUND = "Meteo station with specified id not found";
 	
 	private static final String LAST_METEO_DATA_URL = "/meteo/last";
+	private static final String LAST_SNAPSHOT = "/webcam/latest-snap";
 	private final MeteoStationRepository meteoStationRepository;
 	private final EntityAndTOConverter<MeteoStation, MeteoStationTO> converter;
 	
@@ -101,7 +98,7 @@ public class MeteoStationServiceImpl implements MeteoStationService{
 	
 
 	@Override
-	public MeteoDataTO getLatestMeteoData(UUID stationId) throws MeteoStationServiceException {
+	public MeteoDataTO getLatestMeteoDataFromStation(UUID stationId) throws MeteoStationServiceException {
 		MeteoStation station = meteoStationRepository.findById(stationId);
 		if (station == null) {
 			throw new MeteoStationServiceException(STATION_NOT_FOUND);
@@ -115,5 +112,32 @@ public class MeteoStationServiceImpl implements MeteoStationService{
 			throw new MeteoStationServiceException(e.getMessage());
 		}
 		return meteoDataTO;
+	}
+
+	@Override
+	public MeteoStationTO getStation(UUID stationId) throws MeteoStationServiceException {
+		MeteoStation meteoStation = meteoStationRepository.findById(stationId);
+		if (meteoStation == null) {
+			throw new MeteoStationServiceException(STATION_NOT_FOUND);
+		}
+		
+		return converter.entityToTransferObject(meteoStation);
+	}
+
+	@Override
+	public byte[] getLatestSnapshotFromStation(UUID stationId) throws MeteoStationServiceException {
+		MeteoStation station = meteoStationRepository.findById(stationId);
+		if (station == null) {
+			throw new MeteoStationServiceException(STATION_NOT_FOUND);
+		}
+		
+		byte[] snapshot = null;
+		try {
+			snapshot =	restTemplate.getForObject(station.getStationBaseURL() + LAST_SNAPSHOT, byte[].class);
+			Assert.notNull(snapshot, "Failed to fetch data");
+		} catch (Exception e) {
+			throw new MeteoStationServiceException(e.getMessage());
+		}
+		return snapshot;
 	}
 }

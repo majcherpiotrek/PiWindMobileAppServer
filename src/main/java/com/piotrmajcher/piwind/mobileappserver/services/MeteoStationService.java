@@ -13,5 +13,9 @@ public interface MeteoStationService {
 	
 	List<MeteoStationTO> getAllStations();
 	
-	MeteoDataTO getLatestMeteoData(UUID stationId) throws MeteoStationServiceException;
+	MeteoStationTO getStation(UUID stationId) throws MeteoStationServiceException;
+	
+	MeteoDataTO getLatestMeteoDataFromStation(UUID stationId) throws MeteoStationServiceException;
+	
+	byte[] getLatestSnapshotFromStation(UUID stationId) throws MeteoStationServiceException;
 }

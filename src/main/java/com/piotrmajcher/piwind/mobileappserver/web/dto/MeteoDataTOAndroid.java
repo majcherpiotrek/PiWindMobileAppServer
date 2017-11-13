@@ -2,13 +2,22 @@ package com.piotrmajcher.piwind.mobileappserver.web.dto;
 
 import java.util.Date;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 public class MeteoDataTOAndroid {
 	
-private double temperature;
+	private double temperature;
 	
 	private double windSpeed;
 	
 	private Date dateTime;
+	
+	private String windDirectionDescription;
+	
+	private String beaufortCategoryDescription;
+	
+	private String temperatureConditionsDescription;
 	
 	public double getTemperature() {
 		return temperature;
@@ -33,9 +42,34 @@ private double temperature;
 	public void setDateTime(Date dateTime) {
 		this.dateTime = dateTime;
 	}
+	
+	public String getWindDirectionDescription() {
+		return windDirectionDescription;
+	}
+
+	public void setWindDirectionDescription(String windDirectionDescription) {
+		this.windDirectionDescription = windDirectionDescription;
+	}
+
+	public String getBeaufortCategoryDescription() {
+		return beaufortCategoryDescription;
+	}
+
+	public void setBeaufortCategoryDescription(String beaufortCategoryDescription) {
+		this.beaufortCategoryDescription = beaufortCategoryDescription;
+	}
+
+	public String getTemperatureConditionsDescription() {
+		return temperatureConditionsDescription;
+	}
+
+	public void setTemperatureConditionsDescription(String temperatureConditionsDescription) {
+		this.temperatureConditionsDescription = temperatureConditionsDescription;
+	}
 
 	@Override
 	public String toString() {
-		return "MeteoDataTO [temperature=" + temperature + ", windSpeed=" + windSpeed + ", dateTime=" + dateTime + "]";
+		Gson gson = new GsonBuilder().create();
+		return gson.toJson(this);
 	}
 }
