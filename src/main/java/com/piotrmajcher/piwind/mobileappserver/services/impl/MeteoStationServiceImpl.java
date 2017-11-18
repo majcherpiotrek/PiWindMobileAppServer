@@ -160,7 +160,8 @@ public class MeteoStationServiceImpl implements MeteoStationService{
 		// /last/{minutes}/minutes
 		StringBuilder sb = new StringBuilder();
 		sb.append(meteoStation.getStationBaseURL());
-		sb.append("/last");
+		sb.append("/meteo");
+		sb.append("/last/");
 		sb.append(minutes);
 		sb.append("/minutes");
 		
@@ -174,7 +175,7 @@ public class MeteoStationServiceImpl implements MeteoStationService{
 		int actualSamplesReceived = calculateReceivedSamplesNumber(meteoData, intervalMinutes);
 		List<WindStatisticsDataTO> result = null;
 		try {
-			result = createWindStatisticsFromMeteoData(responseEntity.getBody(), actualSamplesReceived);
+			result = createWindStatisticsFromMeteoData(meteoData, actualSamplesReceived);
 		} catch (IllegalArgumentException e) {
 			throw new MeteoStationServiceException(e.getMessage());
 		}
@@ -183,43 +184,62 @@ public class MeteoStationServiceImpl implements MeteoStationService{
 	}
 
 	protected int calculateReceivedSamplesNumber(MeteoDataTO[] meteoData, int intervalMinutes) {
-		long oldestSampleSeconds = meteoData[0].getDateTime().atZone(ZoneId.systemDefault()).toEpochSecond();
-		long newestSampleSeconds = meteoData[meteoData.length - 1].getDateTime().atZone(ZoneId.systemDefault()).toEpochSecond();
-		long timeDiffSeconds = newestSampleSeconds - oldestSampleSeconds;
-		return Math.toIntExact(timeDiffSeconds / (intervalMinutes * 60));
+		int result = 0;
+		if (meteoData.length != 0) {
+			long oldestSampleSeconds = meteoData[0].getDateTime().atZone(ZoneId.systemDefault()).toEpochSecond();
+			long newestSampleSeconds = meteoData[meteoData.length - 1].getDateTime().atZone(ZoneId.systemDefault()).toEpochSecond();
+			long timeDiffSeconds = newestSampleSeconds - oldestSampleSeconds;
+			long intervalSeconds = intervalMinutes * 60;
+			if (timeDiffSeconds < intervalSeconds) {
+				result = 1;
+			} else {
+				result = Math.toIntExact(timeDiffSeconds / intervalSeconds);
+				if (timeDiffSeconds - result * intervalSeconds > 0) {
+					result++;
+				}
+			}
+		}
+		
+		return result;
 	}
 
 	protected List<WindStatisticsDataTO> createWindStatisticsFromMeteoData(MeteoDataTO[] meteoData, int samples) throws IllegalArgumentException{
-		int partition = meteoData.length / samples;
-		List<List<MeteoDataTO>> meteoDataSamples = Lists.partition(Arrays.asList(meteoData), partition); // can throw exception i partition too big
 		List<WindStatisticsDataTO> windStatistics = new LinkedList<>();
-		
-		for (List<MeteoDataTO> sampleList : meteoDataSamples) {
-			WindStatisticsDataTO statistic = new WindStatisticsDataTO();
-			float avgWind = 0f;
-			float maxGust = 0f;
-			float minGust = Float.MAX_VALUE;
-			for (MeteoDataTO sample : sampleList) {
-				float wind = (float) sample.getWindSpeed();
-				avgWind += wind;
-				if (wind > maxGust) {
-					maxGust = wind;
+		if (samples > 0) {
+			int partition = meteoData.length / samples;
+			List<List<MeteoDataTO>> meteoDataSamples = Lists.partition(Arrays.asList(meteoData), partition); // can throw exception i partition too big
+			int diff = meteoDataSamples.size() - samples;
+			meteoDataSamples = meteoDataSamples.subList(diff, meteoDataSamples.size());
+			
+			for (int i=0; i < samples; i++) {
+				List<MeteoDataTO> sampleList = meteoDataSamples.get(i);
+				WindStatisticsDataTO statistic = new WindStatisticsDataTO();
+				float avgWind = 0f;
+				float maxGust = 0f;
+				float minGust = Float.MAX_VALUE;
+				for (MeteoDataTO sample :sampleList) {
+					float wind = (float) sample.getWindSpeed();
+					avgWind += wind;
+					if (wind > maxGust) {
+						maxGust = wind;
+					}
+					 if (wind < minGust) {
+						 minGust = wind;
+					 }
 				}
-				 if (wind < minGust) {
-					 minGust = wind;
-				 }
+				
+				avgWind = avgWind / sampleList.size();
+				
+				statistic.setAvgWind(avgWind);
+				statistic.setMaxGust(maxGust);
+				statistic.setMinGust(minGust);
+				Date date = Date.from(sampleList.get(sampleList.size() - 1).getDateTime().atZone(ZoneId.systemDefault()).toInstant());
+				statistic.setDate(date.getTime());
+				
+				windStatistics.add(statistic);
 			}
-			
-			avgWind = avgWind / sampleList.size();
-			
-			statistic.setAvgWind(avgWind);
-			statistic.setMaxGust(maxGust);
-			statistic.setMinGust(minGust);
-			Date date = Date.from(sampleList.get(sampleList.size() - 1).getDateTime().atZone(ZoneId.systemDefault()).toInstant());
-			statistic.setDate(date);
-			
-			windStatistics.add(statistic);
 		}
+		
 		return windStatistics;
 	}
 }

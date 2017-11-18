@@ -13,7 +13,7 @@ public class WindStatisticsDataTO {
     
 	private float minGust;
     
-	private Date date;
+	private long date;
 
 	public float getAvgWind() {
 		return avgWind;
@@ -39,11 +39,11 @@ public class WindStatisticsDataTO {
 		this.minGust = minGust;
 	}
 
-	public Date getDate() {
+	public long getDate() {
 		return date;
 	}
 
-	public void setDate(Date date) {
+	public void setDate(long date) {
 		this.date = date;
 	}
 
