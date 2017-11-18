@@ -1,5 +1,6 @@
 package com.piotrmajcher.piwind.mobileappserver.events.listeners;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -17,7 +18,7 @@ public class SnapshotUpdateApplicationListener implements ApplicationListener<On
 	
 	@Autowired
 	public SnapshotUpdateApplicationListener() {
-		this.listeners = new LinkedList<>();
+		this.listeners = Collections.synchronizedList(new LinkedList<>());
 	}
 	
 	@Override
