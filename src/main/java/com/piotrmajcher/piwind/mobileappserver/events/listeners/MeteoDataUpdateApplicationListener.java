@@ -12,6 +12,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 import com.piotrmajcher.piwind.mobileappserver.events.OnMeteoDataUpdateReceivedEvent;
+import com.piotrmajcher.piwind.mobileappserver.services.AndroidPushNotificationsService;
 import com.piotrmajcher.piwind.mobileappserver.web.dto.MeteoDataTOAndroid;
 
 @Component
@@ -19,18 +20,20 @@ public class MeteoDataUpdateApplicationListener implements ApplicationListener<O
 	private static final Logger logger = Logger.getLogger(MeteoDataUpdateApplicationListener.class);
 	private List<MeteoDataUpdatePublishEventListener> listeners;
 	private Map<UUID, MeteoDataTOAndroid> latestMeasurementsMap;
+	private AndroidPushNotificationsService androidPushNotificationService;
 	
 	@Autowired
-	public MeteoDataUpdateApplicationListener() {
+	public MeteoDataUpdateApplicationListener(AndroidPushNotificationsService androidPushNotificationService) {
 		this.listeners = new LinkedList<>();
 		this.latestMeasurementsMap = new HashMap<>();
+		this.androidPushNotificationService = androidPushNotificationService;
 	}
 	
 	@Override
 	public void onApplicationEvent(OnMeteoDataUpdateReceivedEvent event) {
 		MeteoDataTOAndroid updatedData = event.getUpdatedData();
 		latestMeasurementsMap.put(event.getStationId(), updatedData);
-		
+		androidPushNotificationService.handleMeteoDataUpdate(event.getStationId(), event.getUpdatedData());
 		for (MeteoDataUpdatePublishEventListener listener : listeners) {
 			if (event.getStationId().equals(listener.getListeningStationId())) {
 				listener.onMeteoDataUpdatedPublishedEvent(event.getUpdatedData());
