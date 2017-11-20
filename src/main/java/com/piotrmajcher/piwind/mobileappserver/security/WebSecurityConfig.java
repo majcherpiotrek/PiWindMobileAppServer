@@ -67,15 +67,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) {
         web.ignoring().antMatchers("/h2-console/**")
                 .and()
-                .ignoring().antMatchers("/swagger-ui.html/**")
+                .ignoring().antMatchers("/snapshots/**")
                 .and()
-                .ignoring().antMatchers("/swagger-resources/**")
-                .and()
-                .ignoring().antMatchers("/v2/api-docs/**")
-                .and()
-                .ignoring().antMatchers("/**/favicon.ico")
-                .and()
-                .ignoring().antMatchers("/webjars/**");
+                .ignoring().antMatchers("/meteo/**");
     }
     
     @Bean
