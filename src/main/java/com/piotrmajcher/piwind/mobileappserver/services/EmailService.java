@@ -1,8 +1,8 @@
 package com.piotrmajcher.piwind.mobileappserver.services;
 
-import org.springframework.mail.SimpleMailMessage;
+import com.piotrmajcher.piwind.mobileappserver.services.exceptions.EmailServiceException;
 
 public interface EmailService {
 	
-	void sendMail(SimpleMailMessage mailMessage);
+	void sendMail(String recipientAddress, String subject, String content) throws EmailServiceException;
 }

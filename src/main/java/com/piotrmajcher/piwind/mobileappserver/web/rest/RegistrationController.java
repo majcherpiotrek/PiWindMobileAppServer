@@ -32,10 +32,9 @@ public class RegistrationController {
     private final static String REGISTRATION_SUCCESS_MSG = "Registration successful!";
     
     private final UserService userService;
-
-    private final RegistrationEventsPublisher registrationEventsPublisher;
-
 	
+    private RegistrationEventsPublisher registrationEventsPublisher;
+    
     @Autowired
     public RegistrationController(UserService userService, RegistrationEventsPublisher registrationEventsPublisher) {
         this.userService = userService;

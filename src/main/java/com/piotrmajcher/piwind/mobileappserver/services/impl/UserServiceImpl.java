@@ -30,6 +30,7 @@ import com.piotrmajcher.piwind.mobileappserver.repository.UserRepository;
 import com.piotrmajcher.piwind.mobileappserver.repository.VerificationTokenRepository;
 import com.piotrmajcher.piwind.mobileappserver.services.EmailService;
 import com.piotrmajcher.piwind.mobileappserver.services.UserService;
+import com.piotrmajcher.piwind.mobileappserver.services.exceptions.EmailServiceException;
 import com.piotrmajcher.piwind.mobileappserver.services.exceptions.PasswordsNotMatchingException;
 import com.piotrmajcher.piwind.mobileappserver.services.exceptions.RegistrationException;
 import com.piotrmajcher.piwind.mobileappserver.services.exceptions.RetrievePasswordException;
@@ -265,14 +266,14 @@ public class UserServiceImpl implements UserService {
 
     private void sendRetrieveTokenEmail(String token, UserEntity user) {
         String recipientAddress = user.getEmail();
-        String subject = "Robolify - retrieve password";
+        String subject = "Piwind - retrieve password";
 
-        SimpleMailMessage email = new SimpleMailMessage();
-        email.setFrom("robolify@gmail.com");
-        email.setTo(recipientAddress);
-        email.setSubject(subject);
-        email.setText("Copy this token to change your password: " + token);
-        emailService.sendMail(email);
+        try {
+			emailService.sendMail(user.getEmail(), subject, "Copy this token to change your password: " + token);
+		} catch (EmailServiceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
     
     private UserEntity findByEmail(String email) {
