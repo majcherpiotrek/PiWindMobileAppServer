@@ -1,7 +1,5 @@
 package com.piotrmajcher.piwind.mobileappserver.web.rest;
 
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
