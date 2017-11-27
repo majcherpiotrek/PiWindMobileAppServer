@@ -26,12 +26,12 @@ public class MeteoDataUpdateWebsocketHandler extends TextWebSocketHandler{
 	List<WebSocketSession> sessions = new CopyOnWriteArrayList<>();
 	Map<WebSocketSession, MeteoDataUpdatePublishEventListener> sessionsListeners = new HashMap<>();
 	
-	private MeteoDataUpdateApplicationListener meteoDataUpdateListener;
+	private MeteoDataUpdateApplicationListener meteoDataUpdateApplicationListener;
 	
 	@Autowired
 	public MeteoDataUpdateWebsocketHandler(
-			MeteoDataUpdateApplicationListener meteoDataUpdateListener) {
-		this.meteoDataUpdateListener = meteoDataUpdateListener;
+			MeteoDataUpdateApplicationListener meteoDataUpdateApplicationListener) {
+		this.meteoDataUpdateApplicationListener = meteoDataUpdateApplicationListener;
 	}
 
 	@Override
@@ -40,11 +40,11 @@ public class MeteoDataUpdateWebsocketHandler extends TextWebSocketHandler{
 		UUID stationId = UUID.fromString(message.getPayload().trim());
 		logger.info("Station meteo data update request received. Station id:" + stationId);
 		
-		MeteoDataUpdatePublishEventListener listener = createMeteDataUpdateListenerForSession(session, stationId);
-		meteoDataUpdateListener.addMeteoDataUpdatePublishEventListener(listener);
+		MeteoDataUpdatePublishEventListener listener = createMeteoDataUpdateListenerForSession(session, stationId);
+		meteoDataUpdateApplicationListener.addMeteoDataUpdatePublishEventListener(listener);
 	}
 	
-	private MeteoDataUpdatePublishEventListener createMeteDataUpdateListenerForSession(WebSocketSession session,
+	private MeteoDataUpdatePublishEventListener createMeteoDataUpdateListenerForSession(WebSocketSession session,
 			UUID stationId) {
 		return new MeteoDataUpdatePublishEventListener() {
 			
@@ -59,7 +59,7 @@ public class MeteoDataUpdateWebsocketHandler extends TextWebSocketHandler{
 					}
 				} else {
 					logger.info("Session closed. Cleaning up ...");
-					meteoDataUpdateListener.removeMeteoDataUpdatePublishEventListener(this);
+					meteoDataUpdateApplicationListener.removeMeteoDataUpdatePublishEventListener(this);
 					sessionsListeners.remove(session);
 					sessions.remove(session);
 				}
