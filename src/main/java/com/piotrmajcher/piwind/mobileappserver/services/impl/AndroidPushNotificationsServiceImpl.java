@@ -88,7 +88,7 @@ public class AndroidPushNotificationsServiceImpl implements AndroidPushNotificat
 		   "data": {
 		      "station_id": "<station_uuid>",
 		      "name": "<station_name>",
-		      "stationBaseURL": "<station_url> //not necessary probably
+		      "stationBaseURL": "<station_url> 
 		   },
 		   "to": "/topics/<station_uuid>",
 		   "priority": "high"

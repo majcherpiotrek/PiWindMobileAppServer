@@ -28,8 +28,8 @@ public class WebSocketConfig implements WebSocketConfigurer {
 	
 	@Override
 	public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-		registry.addHandler(snapshotWebsocketHandler, "/snapshots");
-		registry.addHandler(meteoDataWebsocketHandler, "/meteo");
+		registry.addHandler(snapshotWebsocketHandler, UPDATE_SNAPSHOTS_PATH);
+		registry.addHandler(meteoDataWebsocketHandler, UPDATE_METEO_DATA_PATH);
 	}
 
 }
