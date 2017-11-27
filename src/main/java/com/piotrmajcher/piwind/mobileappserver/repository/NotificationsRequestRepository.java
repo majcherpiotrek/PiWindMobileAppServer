@@ -13,5 +13,5 @@ public interface NotificationsRequestRepository extends CrudRepository<Notificat
 	
 	List<NotificationsRequest> findByMeteoStationId(UUID meteoStationId);
 	
-	NotificationsRequest findByMeteoStationIdAndUserId(UUID meteoStationId, UUID userId);
+	NotificationsRequest findByMeteoStation_idAndUser_id(UUID meteoStationId, UUID userId);
 }

@@ -83,7 +83,7 @@ public class MeteoStationServiceImplIntegrationTest {
 		Integer minWindLimit = 20;
 		
 		meteoStationService.addNotificationsRequest(meteoStation.getId(), USERNAME, minWindLimit);
-		NotificationsRequest notificationsRequest = notificationsRequestRepository.findByMeteoStationIdAndUserId(meteoStation.getId(), userEntity.getId());
+		NotificationsRequest notificationsRequest = notificationsRequestRepository.findByMeteoStation_idAndUser_id(meteoStation.getId(), userEntity.getId());
 		assertNotNull(notificationsRequest);
 		assertEquals(minWindLimit, notificationsRequest.getMinWindLimit());
 	}
@@ -130,13 +130,13 @@ public class MeteoStationServiceImplIntegrationTest {
 		Integer minWindLimit = 20;
 		
 		meteoStationService.addNotificationsRequest(meteoStation.getId(), USERNAME, minWindLimit);
-		NotificationsRequest notificationsRequest = notificationsRequestRepository.findByMeteoStationIdAndUserId(meteoStation.getId(), userEntity.getId());
+		NotificationsRequest notificationsRequest = notificationsRequestRepository.findByMeteoStation_idAndUser_id(meteoStation.getId(), userEntity.getId());
 		assertNotNull(notificationsRequest);
 		assertEquals(minWindLimit, notificationsRequest.getMinWindLimit());
 		
 		Integer newMinWindLimit = 30;
 		meteoStationService.changeNotificationsRequestMinWindLimit(meteoStation.getId(), USERNAME, newMinWindLimit);
-		notificationsRequest = notificationsRequestRepository.findByMeteoStationIdAndUserId(meteoStation.getId(), userEntity.getId());
+		notificationsRequest = notificationsRequestRepository.findByMeteoStation_idAndUser_id(meteoStation.getId(), userEntity.getId());
 		assertNotNull(notificationsRequest);
 		assertTrue(notificationsRequestRepository.findAll().size() == 1);
 		assertEquals(newMinWindLimit, notificationsRequest.getMinWindLimit());
@@ -152,7 +152,7 @@ public class MeteoStationServiceImplIntegrationTest {
 		Integer minWindLimit = 20;
 		
 		meteoStationService.addNotificationsRequest(meteoStation.getId(), USERNAME, minWindLimit);
-		NotificationsRequest notificationsRequest = notificationsRequestRepository.findByMeteoStationIdAndUserId(meteoStation.getId(), userEntity.getId());
+		NotificationsRequest notificationsRequest = notificationsRequestRepository.findByMeteoStation_idAndUser_id(meteoStation.getId(), userEntity.getId());
 		assertNotNull(notificationsRequest);
 		assertEquals(minWindLimit, notificationsRequest.getMinWindLimit());
 		
@@ -169,7 +169,7 @@ public class MeteoStationServiceImplIntegrationTest {
 		Integer minWindLimit = 20;
 		
 		meteoStationService.addNotificationsRequest(meteoStation.getId(), USERNAME, minWindLimit);
-		NotificationsRequest notificationsRequest = notificationsRequestRepository.findByMeteoStationIdAndUserId(meteoStation.getId(), userEntity.getId());
+		NotificationsRequest notificationsRequest = notificationsRequestRepository.findByMeteoStation_idAndUser_id(meteoStation.getId(), userEntity.getId());
 		assertNotNull(notificationsRequest);
 		assertEquals(minWindLimit, notificationsRequest.getMinWindLimit());
 		
@@ -188,13 +188,13 @@ public class MeteoStationServiceImplIntegrationTest {
 		Integer minWindLimit = 20;
 		
 		meteoStationService.addNotificationsRequest(meteoStation.getId(), USERNAME, minWindLimit);
-		NotificationsRequest notificationsRequest = notificationsRequestRepository.findByMeteoStationIdAndUserId(meteoStation.getId(), userEntity.getId());
+		NotificationsRequest notificationsRequest = notificationsRequestRepository.findByMeteoStation_idAndUser_id(meteoStation.getId(), userEntity.getId());
 		assertNotNull(notificationsRequest);
 		assertEquals(minWindLimit, notificationsRequest.getMinWindLimit());
 		
 		int repoSizeBefore = notificationsRequestRepository.findAll().size();
 		meteoStationService.cancelNotificationsRequest(meteoStation.getId(), USERNAME);
-		assertNull(notificationsRequestRepository.findByMeteoStationIdAndUserId(meteoStation.getId(), userEntity.getId()));
+		assertNull(notificationsRequestRepository.findByMeteoStation_idAndUser_id(meteoStation.getId(), userEntity.getId()));
 		assertTrue(repoSizeBefore - notificationsRequestRepository.findAll().size() == 1);
 	}
 }

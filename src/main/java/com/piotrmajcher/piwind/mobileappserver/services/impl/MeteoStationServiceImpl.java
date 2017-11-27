@@ -309,7 +309,7 @@ public class MeteoStationServiceImpl implements MeteoStationService{
 			throw new MeteoStationServiceException("Station doesn't exist!");
 		}
 		UserEntity userEntity = userRepository.findByUsername(username);
-		NotificationsRequest notificationsRequest = notificationsRequestRepository.findByMeteoStationIdAndUserId(stationId, userEntity.getId());
+		NotificationsRequest notificationsRequest = notificationsRequestRepository.findByMeteoStation_idAndUser_id(stationId, userEntity.getId());
 		return notificationsRequest;
 	}
 }
