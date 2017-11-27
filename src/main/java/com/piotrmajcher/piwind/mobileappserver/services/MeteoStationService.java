@@ -25,8 +25,6 @@ public interface MeteoStationService {
 	
 	void addNotificationsRequest(UUID stationId, String username, Integer minWindLimit) throws MeteoStationServiceException;
 	
-	void changeNotificationsRequestMinWindLimit(UUID stationId, String username, Integer newMinWindLimit) throws MeteoStationServiceException;
-	
 	void cancelNotificationsRequest(UUID stationId, String username) throws MeteoStationServiceException;
 	
 	List<NotificationsRequest> findAllNotificationsRequestsForStation(UUID stationId);

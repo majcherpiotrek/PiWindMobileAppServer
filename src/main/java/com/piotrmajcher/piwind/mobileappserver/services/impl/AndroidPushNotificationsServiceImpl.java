@@ -103,7 +103,7 @@ public class AndroidPushNotificationsServiceImpl implements AndroidPushNotificat
 			String notificationMsg)
 			throws MeteoStationServiceException, InterruptedException, ExecutionException {
 		MeteoStationTO station = meteoStationService.getStation(stationId);
-		JSONObject body = createNotificationBody(station, notificationsRequest.getUserId(), updatedMeteoData, notificationMsg);
+		JSONObject body = createNotificationBody(station, notificationsRequest.getUsername(), updatedMeteoData, notificationMsg);
 		
 		HttpEntity<String> request = new HttpEntity<>(body.toString());
 		CompletableFuture<String> pushNotification = send(request);
@@ -115,7 +115,7 @@ public class AndroidPushNotificationsServiceImpl implements AndroidPushNotificat
 	
 	private JSONObject createNotificationBody(
 			MeteoStationTO station, 
-			UUID userId, 
+			String username, 
 			MeteoDataTOAndroid updatedMeteoData, 
 			String notificationMsg) throws JSONException {
 		/**
@@ -129,14 +129,14 @@ public class AndroidPushNotificationsServiceImpl implements AndroidPushNotificat
 		      "name": "<station_name>",
 		      "stationBaseURL": "<station_url> 
 		   },
-		   "to": "/topics/<station_uuid>/<user_uuid>",
+		   "to": "/topics/<station_uuid><user_uuid>",
 		   "priority": "high"
 		}
 		 */
 		
 		JSONObject body = new JSONObject();
 		
-		body.put("to", buildTopicUrl(station.getId().toString(), userId.toString()));
+		body.put("to", buildTopicUrl(station.getId().toString(), username));
 		body.put("priority", "high");
  
 		JSONObject notification = new JSONObject();
@@ -155,12 +155,11 @@ public class AndroidPushNotificationsServiceImpl implements AndroidPushNotificat
 		return body;
 	}
 	
-	private String buildTopicUrl(String stationId, String userId) {
+	private String buildTopicUrl(String stationId, String username) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("/topics/");
 		sb.append(stationId);
-		sb.append("/");
-		sb.append(userId);
+		sb.append(username);
 		
 		return sb.toString();
 	}

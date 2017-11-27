@@ -36,8 +36,8 @@ public class NotificationsRequest {
 	 @NotNull
 	 private Integer minWindLimit;
 
-	public UUID getUserId() {
-		return user.getId();
+	public String getUsername() {
+		return user.getUsername();
 	}
 
 	public void setUser(UserEntity user) {

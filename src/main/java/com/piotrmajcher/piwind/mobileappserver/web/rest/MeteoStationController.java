@@ -63,9 +63,9 @@ public class MeteoStationController {
 		return meteoStationService.getLatestSnapshotFromStation(UUID.fromString(stationId.trim()));
 	}
 	
-	@PostMapping("/request-notifications/{stationId}")
+	@GetMapping("/request-notifications/{stationId}/min-wind/{minWindLimit}")
 	@CrossOrigin
-	public ResponseEntity<String> addStationToFavourites(@PathVariable String stationId, @RequestParam Integer minWindLimit, Principal prinncipal) {
+	public ResponseEntity<String> addStationToFavourites(@PathVariable String stationId, @PathVariable Integer minWindLimit, Principal prinncipal) {
 		try {
 			meteoStationService.addNotificationsRequest(UUID.fromString(stationId), prinncipal.getName(), minWindLimit);
 		} catch (MeteoStationServiceException e) {

@@ -265,26 +265,15 @@ public class MeteoStationServiceImpl implements MeteoStationService{
 		
 		UserEntity userEntity = userRepository.findByUsername(username);
 		
-		NotificationsRequest notificationsRequest = new NotificationsRequest();
-		notificationsRequest.setMeteoStation(meteoStation);
-		notificationsRequest.setUser(userEntity);
-		notificationsRequest.setMinWindLimit(minWindLimit);
-		
-		notificationsRequestRepository.save(notificationsRequest);
-	}
-
-	@Override
-	public void changeNotificationsRequestMinWindLimit(UUID stationId, String username, Integer newMinWindLimit) throws MeteoStationServiceException {
 		NotificationsRequest notificationsRequest = getNotificationsRequestForStationAndUser(stationId, username);
 		if (notificationsRequest == null) {
-			throw new MeteoStationServiceException("No notifications request for this station and user!");
+			notificationsRequest = new NotificationsRequest();
+			notificationsRequest.setMeteoStation(meteoStation);
+			notificationsRequest.setUser(userEntity);
 		}
 		
-		if (newMinWindLimit == null || newMinWindLimit < 0) {
-			throw new MeteoStationServiceException("Minimal wind limit has to be specified! Minimal wind limit has to be >= 0");
-		}
+		notificationsRequest.setMinWindLimit(minWindLimit);
 		
-		notificationsRequest.setMinWindLimit(newMinWindLimit);
 		notificationsRequestRepository.save(notificationsRequest);
 	}
 	

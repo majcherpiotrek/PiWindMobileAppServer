@@ -135,7 +135,7 @@ public class MeteoStationServiceImplIntegrationTest {
 		assertEquals(minWindLimit, notificationsRequest.getMinWindLimit());
 		
 		Integer newMinWindLimit = 30;
-		meteoStationService.changeNotificationsRequestMinWindLimit(meteoStation.getId(), USERNAME, newMinWindLimit);
+		meteoStationService.addNotificationsRequest(meteoStation.getId(), USERNAME, newMinWindLimit);
 		notificationsRequest = notificationsRequestRepository.findByMeteoStation_idAndUser_id(meteoStation.getId(), userEntity.getId());
 		assertNotNull(notificationsRequest);
 		assertTrue(notificationsRequestRepository.findAll().size() == 1);
@@ -156,7 +156,7 @@ public class MeteoStationServiceImplIntegrationTest {
 		assertNotNull(notificationsRequest);
 		assertEquals(minWindLimit, notificationsRequest.getMinWindLimit());
 		
-		meteoStationService.changeNotificationsRequestMinWindLimit(meteoStation.getId(), USERNAME, null);
+		meteoStationService.addNotificationsRequest(meteoStation.getId(), USERNAME, null);
 	}
 	
 	@Test(expected = MeteoStationServiceException.class) 
@@ -175,7 +175,7 @@ public class MeteoStationServiceImplIntegrationTest {
 		
 		Integer newMinWindLimit = -1;
 		
-		meteoStationService.changeNotificationsRequestMinWindLimit(meteoStation.getId(), USERNAME, newMinWindLimit);
+		meteoStationService.addNotificationsRequest(meteoStation.getId(), USERNAME, newMinWindLimit);
 	}
 	
 	@Test
