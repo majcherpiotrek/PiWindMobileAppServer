@@ -15,8 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.piotrmajcher.piwind.mobileappserver.events.OnRegistrationCompleteEvent;
-import com.piotrmajcher.piwind.mobileappserver.events.publishers.RegistrationEventsPublisher;
 import com.piotrmajcher.piwind.mobileappserver.services.UserService;
 import com.piotrmajcher.piwind.mobileappserver.services.exceptions.RegistrationException;
 import com.piotrmajcher.piwind.mobileappserver.web.dto.JsonResponseTO;
@@ -32,13 +30,10 @@ public class RegistrationController {
     private final static String REGISTRATION_SUCCESS_MSG = "Registration successful!";
     
     private final UserService userService;
-	
-    private RegistrationEventsPublisher registrationEventsPublisher;
     
     @Autowired
-    public RegistrationController(UserService userService, RegistrationEventsPublisher registrationEventsPublisher) {
+    public RegistrationController(UserService userService) {
         this.userService = userService;
-        this.registrationEventsPublisher = registrationEventsPublisher;
     }
     
     @CrossOrigin
@@ -49,7 +44,6 @@ public class RegistrationController {
         try {
 
             userService.registerUser(userTO);
-            registrationEventsPublisher.publishEvent(new OnRegistrationCompleteEvent(userTO, request.getLocale()));
         } catch (RegistrationException e) {
         	
         	response.setErr(e.getMessage());

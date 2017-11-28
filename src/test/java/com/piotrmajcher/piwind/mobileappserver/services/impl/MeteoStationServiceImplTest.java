@@ -117,5 +117,4 @@ public class MeteoStationServiceImplTest {
 		
 		assertEquals(2, samples);
 	}
-
 }

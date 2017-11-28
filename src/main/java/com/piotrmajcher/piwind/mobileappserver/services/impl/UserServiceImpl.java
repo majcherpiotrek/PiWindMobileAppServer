@@ -1,6 +1,7 @@
 package com.piotrmajcher.piwind.mobileappserver.services.impl;
 
 import static java.util.Collections.emptyList;
+import static org.hamcrest.CoreMatchers.instanceOf;
 
 import java.util.Date;
 import java.util.Set;
@@ -70,16 +71,22 @@ public class UserServiceImpl implements UserService {
     
 	@Override
 	public void registerUser(UserTO userTO) throws RegistrationException {
+		UserEntity user = new UserEntity();
 		try {
             validateUserRegistrationData(userTO);
-            UserEntity user = new UserEntity();
             user.setUsername(userTO.getUsername());
             user.setPassword(userTO.getPassword());
             user.setEmail(userTO.getEmail());
-
+            VerificationToken token = createAndSaveVerificationToken();
+            user.setToken(token);
             saveUser(user);
+            emailService.sendMail(user.getEmail(), "Piwind - account confirmation", "Your account confirmation token: " + token.getToken());
         } catch (Exception e) {
-
+        	
+        	if (e instanceof EmailServiceException) {
+        		userRepository.delete(user);
+        	}
+        	
             String errorMessage = null;
             if (e instanceof TransactionSystemException) {
                 Throwable cause = e.getCause();
@@ -108,11 +115,9 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public VerificationToken createAndSaveVerificationToken(UserTO user) {
+	public VerificationToken createAndSaveVerificationToken() {
 		VerificationToken userToken = new VerificationToken();
         userToken.setToken(generateToken());
-        UserEntity userEntity = userRepository.findByEmail(user.getEmail());
-        userToken.setUser(userEntity);
         return verificationTokenRepository.save(userToken);
 	}
 
@@ -122,24 +127,19 @@ public class UserServiceImpl implements UserService {
 
         Date now = new Date();
         if (verificationToken == null || now.after(verificationToken.getExpiryDate()) ) {
-
-            if (verificationToken != null) {
-                UUID uuid = verificationToken.getUser().getId();
-                verificationTokenRepository.delete(verificationToken.getId());
-                userRepository.delete(uuid);
-            }
-
             throw new RegistrationException("We are sorry, your token is invalid or expired.");
         }
 
-        UserEntity user = findByVerificationToken(token);
+        UserEntity user = findByVerificationToken(verificationToken);
 
         if (user == null) {
             throw new RegistrationException("Could not verify - user does not exist!");
         }
-
-        userRepository.setUserEnabled(user.getId());
-        verificationTokenRepository.delete(verificationToken.getId());
+        
+        user.setEnabled(true);
+        user.setToken(null);
+        userRepository.save(user);
+        verificationTokenRepository.delete(verificationToken);
         logger.info("User \'" + user.getUsername() + "\' has been verified!");
 		
 	}
@@ -161,26 +161,20 @@ public class UserServiceImpl implements UserService {
 		validateRetrievedPassword(retrievePasswordTO);
 
         VerificationToken verificationToken = verificationTokenRepository.findByToken(retrievePasswordTO.getToken());
-
+        
         if (verificationToken == null) {
             throw new RetrievePasswordException("We are sorry, your token is invalid or expired.");
         }
-
-        if (verificationToken.getUser() == null) {
-        	verificationTokenRepository.delete(verificationToken.getId());
+        
+        UserEntity user = userRepository.findByToken(verificationToken);
+        if (user == null) {
+        	verificationTokenRepository.delete(verificationToken);
             throw new RetrievePasswordException("We are sorry, there is no user connected to this token!");
         }
 
         try {
-            UserEntity userEntity = userRepository.findOne(verificationToken.getUser().getId());
-
-            if (userEntity == null) {
-            	verificationTokenRepository.delete(verificationToken.getId());
-                throw new RetrievePasswordException("We are sorry, there is no user connected to this token!");
-            }
-
-            userRepository.setNewPassword(passwordEncoder.encode(retrievePasswordTO.getPassword()), userEntity.getId());
-            verificationTokenRepository.delete(verificationToken.getId());
+            userRepository.setNewPassword(passwordEncoder.encode(retrievePasswordTO.getPassword()), user.getId());
+            verificationTokenRepository.delete(verificationToken);
         } catch (Exception e) {
             throw new RetrievePasswordException(e.getMessage());
         }	
@@ -215,15 +209,17 @@ public class UserServiceImpl implements UserService {
             throw new RetrievePasswordException("User with username \'" + user.getUsername() + "\' does not exist!");
         }
 
-        VerificationToken token = verificationTokenRepository.findByUser(user);
+        VerificationToken token = user.getToken();
         if (token != null) {
             verificationTokenRepository.delete(token);
         }
 
         token = new VerificationToken();
         token.setToken(generateToken());
-        token.setUser(user);
+
         verificationTokenRepository.save(token);
+        user.setToken(token);
+        userRepository.save(user);
 
         sendRetrieveTokenEmail(token.getToken(), user);
     }
@@ -233,8 +229,8 @@ public class UserServiceImpl implements UserService {
         Assert.isTrue(retrievePasswordTO.getPassword().equals(retrievePasswordTO.getMatchingPassword()), "The passwords don't match!");
     }
 
-    private UserEntity findByVerificationToken(String token) {
-        return verificationTokenRepository.findByToken(token).getUser();
+    private UserEntity findByVerificationToken(VerificationToken token) {
+        return userRepository.findByToken(token);
     }
 
     private void validateUserRegistrationData(UserTO userTO) throws UserEmailConstraintViolationException, UsernameConstraintViolationException, PasswordsNotMatchingException {
@@ -269,7 +265,7 @@ public class UserServiceImpl implements UserService {
         String subject = "Piwind - retrieve password";
 
         try {
-			emailService.sendMail(user.getEmail(), subject, "Copy this token to change your password: " + token);
+			emailService.sendMail(recipientAddress, subject, "Copy this token to change your password: " + token);
 		} catch (EmailServiceException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

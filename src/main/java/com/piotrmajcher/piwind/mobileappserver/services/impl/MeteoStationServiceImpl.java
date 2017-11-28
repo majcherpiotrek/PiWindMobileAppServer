@@ -23,7 +23,11 @@ import org.springframework.web.client.RestTemplate;
 
 import com.google.common.collect.Lists;
 import com.piotrmajcher.piwind.mobileappserver.domain.MeteoStation;
+import com.piotrmajcher.piwind.mobileappserver.domain.NotificationsRequest;
+import com.piotrmajcher.piwind.mobileappserver.domain.UserEntity;
 import com.piotrmajcher.piwind.mobileappserver.repository.MeteoStationRepository;
+import com.piotrmajcher.piwind.mobileappserver.repository.NotificationsRequestRepository;
+import com.piotrmajcher.piwind.mobileappserver.repository.UserRepository;
 import com.piotrmajcher.piwind.mobileappserver.services.MeteoStationService;
 import com.piotrmajcher.piwind.mobileappserver.services.exceptions.MeteoStationServiceException;
 import com.piotrmajcher.piwind.mobileappserver.util.EntityAndTOConverter;
@@ -46,13 +50,19 @@ public class MeteoStationServiceImpl implements MeteoStationService{
 	private static final String LAST_METEO_DATA_URL = "/meteo/last";
 	private static final String LAST_SNAPSHOT = "/webcam/latest-snap";
 	private final MeteoStationRepository meteoStationRepository;
+	private final NotificationsRequestRepository notificationsRequestRepository;
+	private final UserRepository userRepository;
 	private final EntityAndTOConverter<MeteoStation, MeteoStationTO> converter;
 	
 	private final RestTemplate restTemplate;
 	
 	@Autowired
-	public MeteoStationServiceImpl(MeteoStationRepository meteoStationRepository) {
+	public MeteoStationServiceImpl(MeteoStationRepository meteoStationRepository, 
+			NotificationsRequestRepository notificationsRequestRepository,
+			UserRepository userRepository) {
 		this.meteoStationRepository = meteoStationRepository;
+		this.notificationsRequestRepository = notificationsRequestRepository;
+		this.userRepository = userRepository;
 		this.converter = new MeteoStationEntityConverter();
 		this.restTemplate = new RestTemplate();
 	}
@@ -241,5 +251,54 @@ public class MeteoStationServiceImpl implements MeteoStationService{
 		}
 		
 		return windStatistics;
+	}
+
+	@Override
+	public void addNotificationsRequest(UUID stationId, String username, Integer minWindLimit) throws MeteoStationServiceException {
+		MeteoStation meteoStation = meteoStationRepository.findById(stationId);
+		if (meteoStation == null) {
+			throw new MeteoStationServiceException("Station doesn't exist!");
+		}
+		if (minWindLimit == null || minWindLimit < 0) {
+			throw new MeteoStationServiceException("Minimal wind limit has to be specified! Minimal wind limit has to be >= 0");
+		}
+		
+		UserEntity userEntity = userRepository.findByUsername(username);
+		
+		NotificationsRequest notificationsRequest = getNotificationsRequestForStationAndUser(stationId, username);
+		if (notificationsRequest == null) {
+			notificationsRequest = new NotificationsRequest();
+			notificationsRequest.setMeteoStation(meteoStation);
+			notificationsRequest.setUser(userEntity);
+		}
+		
+		notificationsRequest.setMinWindLimit(minWindLimit);
+		
+		notificationsRequestRepository.save(notificationsRequest);
+	}
+	
+	@Override
+	public void cancelNotificationsRequest(UUID stationId, String username) throws MeteoStationServiceException {
+		NotificationsRequest notificationsRequest = getNotificationsRequestForStationAndUser(stationId, username);
+		if (notificationsRequest != null) {
+			notificationsRequestRepository.delete(notificationsRequest);
+		}
+	}
+	
+	
+	@Override
+	public List<NotificationsRequest> findAllNotificationsRequestsForStation(UUID stationId) {
+		return notificationsRequestRepository.findByMeteoStationId(stationId);
+	}
+
+	private NotificationsRequest getNotificationsRequestForStationAndUser(UUID stationId, String username)
+			throws MeteoStationServiceException {
+		MeteoStation meteoStation = meteoStationRepository.findById(stationId);
+		if (meteoStation == null) {
+			throw new MeteoStationServiceException("Station doesn't exist!");
+		}
+		UserEntity userEntity = userRepository.findByUsername(username);
+		NotificationsRequest notificationsRequest = notificationsRequestRepository.findByMeteoStation_idAndUser_id(stationId, userEntity.getId());
+		return notificationsRequest;
 	}
 }

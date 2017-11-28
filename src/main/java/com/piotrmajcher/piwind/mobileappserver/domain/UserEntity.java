@@ -2,11 +2,15 @@ package com.piotrmajcher.piwind.mobileappserver.domain;
 
 import java.util.UUID;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import org.hibernate.validator.constraints.Email;
@@ -34,6 +38,11 @@ public class UserEntity {
     @NotEmpty(message = "Please provide a password")
 	@Length(min = 8, message = "The password must be at least 8 characters")
 	private String password;
+    
+    @OneToOne(targetEntity = VerificationToken.class, cascade = CascadeType.REMOVE)
+    @JoinColumn(nullable = true, name = "token_id")
+    private VerificationToken token;
+    
 
     private boolean enabled;
 
@@ -73,7 +82,15 @@ public class UserEntity {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-
+	
+	public VerificationToken getToken() {
+		return token;
+	}
+	
+	public void setToken(VerificationToken token) {
+		this.token = token;
+	}
+	
 	public boolean isEnabled() {
 		return enabled;
 	}

@@ -43,7 +43,7 @@ public class EmailServiceImpl implements EmailService {
 		    logger.info(response.body);
 		    logger.info(response.headers);
 		} catch (IOException e) {
-		      throw new EmailServiceException(e.getMessage());
+		      throw new EmailServiceException("Failed to send registration confirmation email");
 	    }
     }
 

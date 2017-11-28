@@ -1,7 +1,9 @@
 package com.piotrmajcher.piwind.mobileappserver.services.impl;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -16,6 +18,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.piotrmajcher.piwind.mobileappserver.domain.NotificationsRequest;
 import com.piotrmajcher.piwind.mobileappserver.services.AndroidPushNotificationsService;
 import com.piotrmajcher.piwind.mobileappserver.services.MeteoStationService;
 import com.piotrmajcher.piwind.mobileappserver.services.exceptions.MeteoStationServiceException;
@@ -29,13 +32,18 @@ public class AndroidPushNotificationsServiceImpl implements AndroidPushNotificat
 	private static final String FIREBASE_SERVER_KEY = "AAAAskASe5Q:APA91bHI37wmTGb063qT80i3RZ35tIpVKjQq7D-OxhL_EApX-WoL-K_Vg2XO8RPO-TzLSrG7ZYl-OgMhYThaaXcJXcrpxa71rkrInp7V0H4sXodz1DPcp4hK13nprKL3jp1OH8WbLr9B";
 	private static final String FIREBASE_API_URL = "https://fcm.googleapis.com/fcm/send";
 	
+	private static final String WIND_PICKED_UP_MESSAGE = "The wind has picked!";
+	private static final String WIND_DROPPED_MESSAGE = "The wind has dropped ...";
+	
 	private RestTemplate restTemplate;
 	private MeteoStationService meteoStationService;
+	private Set<NotificationsRequest> notificationsSentSet;
 	
 	@Autowired
 	public AndroidPushNotificationsServiceImpl(MeteoStationService meteoStationService) {
 		this.restTemplate = new RestTemplate();
 		this.meteoStationService = meteoStationService;
+		this.notificationsSentSet = new HashSet<>();
 	}
 	
 	@Async
@@ -60,25 +68,56 @@ public class AndroidPushNotificationsServiceImpl implements AndroidPushNotificat
 	@Override
 	public void handleMeteoDataUpdate(UUID stationId, MeteoDataTOAndroid updatedMeteoData) {
 		
-		if (updatedMeteoData.getWindSpeed() > 1.0) {
-			
+		List<NotificationsRequest> notificationsRequestsForStation = meteoStationService.findAllNotificationsRequestsForStation(stationId);
+		
+		for (NotificationsRequest notificationsRequest : notificationsRequestsForStation) {
 			try {
-				MeteoStationTO station = meteoStationService.getStation(stationId);
-				JSONObject body = createNotificationBody(station, updatedMeteoData);
-				
-				HttpEntity<String> request = new HttpEntity<>(body.toString());
-				CompletableFuture<String> pushNotification = send(request);
-				CompletableFuture.allOf(pushNotification).join();
-				String firebaseResponse = pushNotification.get();
-				logger.info("Notification for station with id " + stationId + " has been sent!");
-				logger.info("Firebase response: " + firebaseResponse);
+				handleNotificationsRequest(stationId, updatedMeteoData, notificationsRequest);
 			} catch (ExecutionException | InterruptedException | JSONException | MeteoStationServiceException e) {
 				logger.error("Error while trying to send the notification: " + e.getMessage());
 			}
 		}
 	}
+
+	private void handleNotificationsRequest(UUID stationId, MeteoDataTOAndroid updatedMeteoData,
+			NotificationsRequest notificationsRequest)
+			throws MeteoStationServiceException, InterruptedException, ExecutionException {
+		if (updatedMeteoData.getWindSpeed() >= notificationsRequest.getMinWindLimit()) {
+			if (!notificationsSentSet.contains(notificationsRequest)) {
+				sendNotificationToStation(stationId, updatedMeteoData, notificationsRequest, WIND_PICKED_UP_MESSAGE);
+				notificationsSentSet.add(notificationsRequest);
+			}
+		} else {
+			if (notificationsSentSet.contains(notificationsRequest)) {
+				sendNotificationToStation(stationId, updatedMeteoData, notificationsRequest, WIND_DROPPED_MESSAGE);
+				notificationsSentSet.remove(notificationsRequest);
+			}
+		}
+	}
+
+
+	private void sendNotificationToStation(
+			UUID stationId,
+			MeteoDataTOAndroid updatedMeteoData,
+			NotificationsRequest notificationsRequest,
+			String notificationMsg)
+			throws MeteoStationServiceException, InterruptedException, ExecutionException {
+		MeteoStationTO station = meteoStationService.getStation(stationId);
+		JSONObject body = createNotificationBody(station, notificationsRequest.getUsername(), updatedMeteoData, notificationMsg);
+		
+		HttpEntity<String> request = new HttpEntity<>(body.toString());
+		CompletableFuture<String> pushNotification = send(request);
+		CompletableFuture.allOf(pushNotification).join();
+		String firebaseResponse = pushNotification.get();
+		logger.info("Notification for station with id " + stationId + " has been sent!");
+		logger.info("Firebase response: " + firebaseResponse);
+	}
 	
-	private JSONObject createNotificationBody(MeteoStationTO station, MeteoDataTOAndroid updatedMeteoData) throws JSONException {
+	private JSONObject createNotificationBody(
+			MeteoStationTO station, 
+			String username, 
+			MeteoDataTOAndroid updatedMeteoData, 
+			String notificationMsg) throws JSONException {
 		/**
 		{
 		   "notification": {
@@ -90,17 +129,19 @@ public class AndroidPushNotificationsServiceImpl implements AndroidPushNotificat
 		      "name": "<station_name>",
 		      "stationBaseURL": "<station_url> 
 		   },
-		   "to": "/topics/<station_uuid>",
+		   "to": "/topics/<station_uuid><user_uuid>",
 		   "priority": "high"
 		}
-*/
+		 */
+		
 		JSONObject body = new JSONObject();
-		body.put("to", "/topics/" + station.getId().toString());
+		
+		body.put("to", buildTopicUrl(station.getId().toString(), username));
 		body.put("priority", "high");
  
 		JSONObject notification = new JSONObject();
 		notification.put("title", station.getName());
-		notification.put("body", "The wind has picked up!");
+		notification.put("body", notificationMsg);
 		notification.put("sound", "default");
 		
 		JSONObject data = new JSONObject();
@@ -112,6 +153,15 @@ public class AndroidPushNotificationsServiceImpl implements AndroidPushNotificat
 		body.put("data", data);
 		
 		return body;
+	}
+	
+	private String buildTopicUrl(String stationId, String username) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("/topics/");
+		sb.append(stationId);
+		sb.append(username);
+		
+		return sb.toString();
 	}
 
 }

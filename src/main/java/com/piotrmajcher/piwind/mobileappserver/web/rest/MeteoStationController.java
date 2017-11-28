@@ -1,5 +1,6 @@
 package com.piotrmajcher.piwind.mobileappserver.web.rest;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,6 +32,9 @@ public class MeteoStationController {
 	private final MeteoStationService meteoStationService;
 	
 	private static final String STATION_REGISTRATION_SUCCESS = "Successfully registered new station with id ";
+	private static final String ADDED_TO_FAVOURITES = "Added the station to favourites";
+	private static final String NOTIFICATIONS_CANCELED = "Notifications canceled";
+	
 	@Autowired
 	public MeteoStationController(MeteoStationService meteoStationService) {
 		this.meteoStationService = meteoStationService;
@@ -57,5 +62,27 @@ public class MeteoStationController {
 	@CrossOrigin
 	public @ResponseBody byte[] getLatestSnapshot(@PathVariable String stationId) throws Exception {
 		return meteoStationService.getLatestSnapshotFromStation(UUID.fromString(stationId.trim()));
+	}
+	
+	@GetMapping("/request-notifications/{stationId}/min-wind/{minWindLimit}")
+	@CrossOrigin
+	public ResponseEntity<String> addStationToFavourites(@PathVariable String stationId, @PathVariable Integer minWindLimit, Principal prinncipal) {
+		try {
+			meteoStationService.addNotificationsRequest(UUID.fromString(stationId), prinncipal.getName(), minWindLimit);
+		} catch (MeteoStationServiceException e) {
+			return new ResponseEntity<String>(e.getMessage(), HttpStatus.CONFLICT);
+		}
+		return new ResponseEntity<>(ADDED_TO_FAVOURITES, HttpStatus.OK);	
+	}
+	
+	@GetMapping("/cancel-notifications/{stationId}")
+	@CrossOrigin
+	public ResponseEntity<String> addStationToFavourites(@PathVariable String stationId, Principal principal) {
+		try {
+			meteoStationService.cancelNotificationsRequest(UUID.fromString(stationId.trim()), principal.getName());
+		} catch (MeteoStationServiceException e) {
+			return new ResponseEntity<String>(e.getMessage(), HttpStatus.CONFLICT);
+		}
+		return new ResponseEntity<>(NOTIFICATIONS_CANCELED, HttpStatus.OK);	
 	}
 }
