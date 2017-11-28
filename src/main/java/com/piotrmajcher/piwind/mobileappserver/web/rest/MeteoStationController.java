@@ -33,6 +33,7 @@ public class MeteoStationController {
 	
 	private static final String STATION_REGISTRATION_SUCCESS = "Successfully registered new station with id ";
 	private static final String ADDED_TO_FAVOURITES = "Added the station to favourites";
+	private static final String NOTIFICATIONS_CANCELED = "Notifications canceled";
 	
 	@Autowired
 	public MeteoStationController(MeteoStationService meteoStationService) {
@@ -72,5 +73,16 @@ public class MeteoStationController {
 			return new ResponseEntity<String>(e.getMessage(), HttpStatus.CONFLICT);
 		}
 		return new ResponseEntity<>(ADDED_TO_FAVOURITES, HttpStatus.OK);	
+	}
+	
+	@GetMapping("/cancel-notifications/{stationId}")
+	@CrossOrigin
+	public ResponseEntity<String> addStationToFavourites(@PathVariable String stationId, Principal principal) {
+		try {
+			meteoStationService.cancelNotificationsRequest(UUID.fromString(stationId.trim()), principal.getName());
+		} catch (MeteoStationServiceException e) {
+			return new ResponseEntity<String>(e.getMessage(), HttpStatus.CONFLICT);
+		}
+		return new ResponseEntity<>(NOTIFICATIONS_CANCELED, HttpStatus.OK);	
 	}
 }

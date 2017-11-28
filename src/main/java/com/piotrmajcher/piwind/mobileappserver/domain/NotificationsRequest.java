@@ -24,12 +24,12 @@ public class NotificationsRequest {
 	 private Long id;
 	 
 	 @NotNull
-	 @ManyToOne(targetEntity = UserEntity.class, fetch = FetchType.LAZY)
+	 @ManyToOne(targetEntity = UserEntity.class)
 	 @JoinColumn(nullable = false, name = "user_id")
 	 private UserEntity user;
 	 
 	 @NotNull
-	 @ManyToOne(targetEntity = MeteoStation.class, fetch = FetchType.LAZY)
+	 @ManyToOne(targetEntity = MeteoStation.class)
 	 @JoinColumn(nullable = false, name = "meteoStation_id")
 	 private MeteoStation meteoStation;
 	 

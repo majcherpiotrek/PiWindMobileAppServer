@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import org.springframework.security.core.userdetails.UserDetailsService;
 
+import com.piotrmajcher.piwind.mobileappserver.domain.UserEntity;
 import com.piotrmajcher.piwind.mobileappserver.domain.VerificationToken;
 import com.piotrmajcher.piwind.mobileappserver.services.exceptions.RegistrationException;
 import com.piotrmajcher.piwind.mobileappserver.services.exceptions.RetrievePasswordException;
@@ -24,7 +25,7 @@ public interface UserService {
 
 	UUID getUserId(String username);
 
-	VerificationToken createAndSaveVerificationToken(UserTO user);
+	VerificationToken createAndSaveVerificationToken();
 	
 	UserDetailsService getUserDetailsService();
 }

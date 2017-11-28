@@ -24,10 +24,6 @@ public class VerificationToken {
 	    @Column(unique = true)
 	    private String token;
 
-	    @OneToOne(targetEntity = UserEntity.class, fetch = FetchType.EAGER)
-	    @JoinColumn(nullable = false, name = "user_id")
-	    private UserEntity user;
-
 	    private Date expiryDate;
 
 	    private Date calculateExpiryDate(int expiryTimeInMinutes) {
@@ -56,14 +52,6 @@ public class VerificationToken {
 
 	    public void setToken(String token) {
 	        this.token = token;
-	    }
-
-	    public UserEntity getUser() {
-	        return user;
-	    }
-
-	    public void setUser(UserEntity user) {
-	        this.user = user;
 	    }
 
 	    public Date getExpiryDate() {

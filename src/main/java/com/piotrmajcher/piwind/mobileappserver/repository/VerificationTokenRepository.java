@@ -10,6 +10,5 @@ import com.piotrmajcher.piwind.mobileappserver.domain.VerificationToken;
 public interface VerificationTokenRepository extends CrudRepository<VerificationToken, Long>{
 
     VerificationToken findByToken(String token);
-    VerificationToken findByUser(UserEntity user);
     List<VerificationToken> findAll();
 }
