@@ -25,6 +25,6 @@ public interface UserRepository extends CrudRepository<UserEntity, UUID>{
     
     UserEntity findByToken(VerificationToken token);
     
-    @Query("SELECT * FROM UserEntity u WHERE u.enabled = false")
+    @Query("SELECT u FROM UserEntity u WHERE u.enabled = FALSE")
 	List<UserEntity> findAllUnconfirmed();
 }

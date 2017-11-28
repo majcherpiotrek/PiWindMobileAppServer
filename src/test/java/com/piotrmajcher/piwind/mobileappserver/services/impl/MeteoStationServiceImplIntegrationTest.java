@@ -30,7 +30,7 @@ public class MeteoStationServiceImplIntegrationTest {
 	
 	private static final String STATION = "Station";
 
-	private static final String USERNAME = "username";
+	private static final String USERNAME = "testuser";
 
 	@Autowired
 	private MeteoStationService meteoStationService;
@@ -53,8 +53,8 @@ public class MeteoStationServiceImplIntegrationTest {
 		}
 		userEntity = new UserEntity();
 		userEntity.setUsername(USERNAME);
-		userEntity.setPassword("password");
-		userEntity.setEmail("example@mail.com");
+		userEntity.setPassword("testpassword");
+		userEntity.setEmail("testmail@mail.com");
 		userEntity.setEnabled(true);
 		userRepository.save(userEntity);
 		
