@@ -20,6 +20,7 @@ import com.sendgrid.SendGrid;
 @Service
 public class EmailServiceImpl implements EmailService {
 
+	private static final String FAILED_TO_SEND_REGISTRATION_CONFIRMATION_EMAIL = "Failed to send registration confirmation email";
 	private static final Logger logger = Logger.getLogger(EmailServiceImpl.class);
 
     @Override
@@ -40,10 +41,13 @@ public class EmailServiceImpl implements EmailService {
 		    request.body = mail.build();
 		    Response response = sg.api(request);
 		    logger.info(response.statusCode);
+		    if (response.statusCode != 250) {
+		    	throw new EmailServiceException(FAILED_TO_SEND_REGISTRATION_CONFIRMATION_EMAIL);
+		    }
 		    logger.info(response.body);
 		    logger.info(response.headers);
 		} catch (IOException e) {
-		      throw new EmailServiceException("Failed to send registration confirmation email");
+		      throw new EmailServiceException(FAILED_TO_SEND_REGISTRATION_CONFIRMATION_EMAIL);
 	    }
     }
 
