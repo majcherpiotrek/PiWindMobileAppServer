@@ -41,13 +41,13 @@ public class EmailServiceImpl implements EmailService {
 		    request.body = mail.build();
 		    Response response = sg.api(request);
 		    logger.info(response.statusCode);
-		    if (response.statusCode != 250) {
-		    	throw new EmailServiceException(FAILED_TO_SEND_REGISTRATION_CONFIRMATION_EMAIL + " " + response.statusCode);
+		    if (response.statusCode != 200 && response.statusCode != 202) {
+		    	throw new EmailServiceException(FAILED_TO_SEND_REGISTRATION_CONFIRMATION_EMAIL);
 		    }
 		    logger.info(response.body);
 		    logger.info(response.headers);
 		} catch (IOException e) {
-		      throw new EmailServiceException(FAILED_TO_SEND_REGISTRATION_CONFIRMATION_EMAIL + " " + e.getMessage());
+		      throw new EmailServiceException(FAILED_TO_SEND_REGISTRATION_CONFIRMATION_EMAIL);
 	    }
     }
 
