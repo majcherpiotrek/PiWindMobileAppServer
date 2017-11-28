@@ -15,7 +15,7 @@ import com.piotrmajcher.piwind.mobileappserver.repository.UserRepository;
 @Component
 public class UnconfirmedAccountsCleaner {
 	
-	private static final long CLEANUP_INTERVAL_MINUTES = 1000 * 60 * 5; // 5 minutes 
+	private static final long CLEANUP_INTERVAL_MINUTES = 1000 * 60 * 1; // 5 minutes 
 	private UserRepository userRepository;
 	
 	@Autowired
