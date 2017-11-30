@@ -48,7 +48,7 @@ public class MeteoStationController {
 			UUID savedStationId = meteoStationService.registerStation(stationTO);
 			return new ResponseEntity<>(STATION_REGISTRATION_SUCCESS + savedStationId.toString(), HttpStatus.OK);
 		} catch (MeteoStationServiceException e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+			return new ResponseEntity<>(e.getStackTrace().toString(), HttpStatus.CONFLICT);
 		}
 	}
 	
