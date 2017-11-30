@@ -50,7 +50,7 @@ public class MeteoStationController {
 		} catch (MeteoStationServiceException e) {
 			String errMsg = "";
 			for (StackTraceElement err : e.getStackTrace()) {
-				errMsg = err.toString() + "\n";
+				errMsg += err.toString() + "\n";
 			}
 			return new ResponseEntity<>(errMsg, HttpStatus.CONFLICT);
 		}
