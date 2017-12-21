@@ -32,8 +32,6 @@ public class EnviromentConfig {
 	    if ("development".equals(activeProfile)) {
 	      resource = new ClassPathResource("/development.properties");
               developmentModeEnabled = true;
-//	    } else if ("test".equals(activeProfile)) {
-//	      resource = new ClassPathResource("/META-INF/test.properties");
 	    } else {
 	      resource = new ClassPathResource("/production.properties");
 	    }

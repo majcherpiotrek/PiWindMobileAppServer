@@ -1,5 +1,7 @@
 package com.piotrmajcher.piwind.mobileappserver;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -22,6 +24,8 @@ public class DevelopmentDataLoader implements ApplicationRunner {
 	
 	@Autowired
 	public DevelopmentDataLoader(UserService userService, UserRepository userRepository) {
+		this.userRepository = userRepository;
+		this.userService = userService;
 		AnnotationConfigApplicationContext ctx= new AnnotationConfigApplicationContext(EnviromentConfig.class);
 		DevelopmentDataLoaderConfigurer config = ctx.getBean(DevelopmentDataLoaderConfigurer.class);
 		enabled = config.isAddTestUser();
