@@ -31,6 +31,7 @@ public class EnviromentConfig {
 	    // choose different property files for different active profile
 	    if ("development".equals(activeProfile)) {
 	      resource = new ClassPathResource("/development.properties");
+              developmentModeEnabled = true;
 //	    } else if ("test".equals(activeProfile)) {
 //	      resource = new ClassPathResource("/META-INF/test.properties");
 	    } else {
