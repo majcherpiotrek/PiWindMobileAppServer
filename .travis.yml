@@ -1,6 +1,4 @@
 language: java
 jdk:
  - oraclejdk8
-before_script:
-- "export JAVA_OPTS=-Xmx2048m -Xms512m -Dspring.profiles.active=development"
-script: gradle clean build
+script: gradle clean build -Dspring.profiles.active=development
