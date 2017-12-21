@@ -17,11 +17,6 @@ public interface UserRepository extends CrudRepository<UserEntity, UUID>{
 	
 	UserEntity findByUsername(String username);
     UserEntity findByEmail(String email);
-
-    @Modifying
-    @Transactional
-    @Query("UPDATE UserEntity u SET u.password = :password WHERE u.id = :id")
-    void setNewPassword(@Param("password") String password, @Param("id") UUID id);
     
     UserEntity findByToken(VerificationToken token);
     

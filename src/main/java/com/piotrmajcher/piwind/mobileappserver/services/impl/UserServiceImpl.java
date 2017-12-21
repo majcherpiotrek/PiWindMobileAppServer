@@ -173,7 +173,9 @@ public class UserServiceImpl implements UserService {
         }
 
         try {
-            userRepository.setNewPassword(passwordEncoder.encode(retrievePasswordTO.getPassword()), user.getId());
+        	user.setPassword(passwordEncoder.encode(retrievePasswordTO.getPassword()));
+        	user.setToken(null);
+            userRepository.save(user);
             verificationTokenRepository.delete(verificationToken);
         } catch (Exception e) {
             throw new RetrievePasswordException(e.getMessage());
