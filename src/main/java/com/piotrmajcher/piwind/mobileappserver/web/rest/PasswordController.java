@@ -63,7 +63,7 @@ public class PasswordController {
     	JsonResponseTO response = new JsonResponseTO();
         try {
             userService.changeRetrievedPassword(retrievePasswordTO);
-        } catch (RetrievePasswordException e) {
+        } catch (Exception e) {
         	response.setErr(e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.CONFLICT);
         }
