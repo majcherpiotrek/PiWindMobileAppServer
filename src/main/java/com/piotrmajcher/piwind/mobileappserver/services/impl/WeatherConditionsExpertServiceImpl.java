@@ -3,8 +3,10 @@ package com.piotrmajcher.piwind.mobileappserver.services.impl;
 import org.springframework.stereotype.Service;
 
 import com.piotrmajcher.piwind.mobileappserver.enums.BeaufortScale;
+import com.piotrmajcher.piwind.mobileappserver.enums.EquipmentSuggestion;
 import com.piotrmajcher.piwind.mobileappserver.enums.RelativeWindDirection;
 import com.piotrmajcher.piwind.mobileappserver.enums.TemperatureCategories;
+import com.piotrmajcher.piwind.mobileappserver.enums.WaterConditions;
 import com.piotrmajcher.piwind.mobileappserver.enums.WindDirection;
 import com.piotrmajcher.piwind.mobileappserver.services.WeatherConditionsExpertService;
 
@@ -101,6 +103,65 @@ public class WeatherConditionsExpertServiceImpl implements WeatherConditionsExpe
 		
 		if (categoryCalculated == null) {
 			throw new IllegalStateException("Unexpected error while calculating the temperature category");
+		}
+		return categoryCalculated;
+	}
+
+	@Override
+	public String getWaterConditionsDescription(WindDirection beachFacingDirection, WindDirection windDirection) {
+		RelativeWindDirection relativeWindDirection = calculateRelativeWindDirection(beachFacingDirection, windDirection);
+		WaterConditions waterConditions = calculateWaterConditions(relativeWindDirection);
+		return waterConditions.toString();
+	}
+
+	private WaterConditions calculateWaterConditions(RelativeWindDirection relativeWindDirection) {
+		WaterConditions waterConditions = WaterConditions.CHOPPY;
+		switch (relativeWindDirection) {
+			case ONSHORE:
+				waterConditions = WaterConditions.WAVY;
+				break;
+			case CROSSONSHORE:
+				waterConditions = WaterConditions.VERYCHOPPY;
+				break;
+			case CROSSSHORE:
+				waterConditions = WaterConditions.CHOPPY;
+				break;
+			case CROSSOFFSHORE:
+				waterConditions = WaterConditions.FLAT;
+				break;
+			case OFFSHORE:
+				waterConditions = WaterConditions.FLAT;
+				break;
+		}
+		return waterConditions;
+	}
+
+	@Override
+	public String getEquipmentSuggestion(double windSpeed) {
+		EquipmentSuggestion eqSuggestion = calculateEquipmentSuggestion(windSpeed);
+		return eqSuggestion.getAdvice();
+	}
+
+	private EquipmentSuggestion calculateEquipmentSuggestion(double windSpeed) {
+		EquipmentSuggestion[] categories = EquipmentSuggestion.values();
+		EquipmentSuggestion categoryCalculated = null;
+		
+		for (int i = 1; i < categories.length; i++) {
+			EquipmentSuggestion category = categories[i];
+			if (windSpeed <= EquipmentSuggestion.VERY_BIG_SETUP.getTopLimitMPS()) {
+				categoryCalculated = EquipmentSuggestion.VERY_BIG_SETUP;
+				break;
+			} else {
+				EquipmentSuggestion lowerCategory = categories[i-1];
+				if (windSpeed > lowerCategory.getTopLimitMPS() && windSpeed <= category.getTopLimitMPS()) {
+					categoryCalculated = category;
+					break;
+				}
+			}
+		}
+		
+		if (categoryCalculated == null) {
+			throw new IllegalStateException("Unexpected error while calculating the equipment suggestion");
 		}
 		return categoryCalculated;
 	}

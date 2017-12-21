@@ -19,6 +19,10 @@ public class MeteoDataTOAndroid {
 	
 	private String temperatureConditionsDescription;
 	
+	private String waterConditionsDescription;
+	
+	private String equipmentSuggestion;
+	
 	public double getTemperature() {
 		return temperature;
 	}
@@ -65,6 +69,22 @@ public class MeteoDataTOAndroid {
 
 	public void setTemperatureConditionsDescription(String temperatureConditionsDescription) {
 		this.temperatureConditionsDescription = temperatureConditionsDescription;
+	}
+	
+	public String getWaterConditionsDescription() {
+		return waterConditionsDescription;
+	}
+
+	public void setWaterConditionsDescription(String waterConditionsDescription) {
+		this.waterConditionsDescription = waterConditionsDescription;
+	}
+
+	public String getEquipmentSuggestion() {
+		return equipmentSuggestion;
+	}
+
+	public void setEquipmentSuggestion(String equipmentSuggestion) {
+		this.equipmentSuggestion = equipmentSuggestion;
 	}
 
 	@Override

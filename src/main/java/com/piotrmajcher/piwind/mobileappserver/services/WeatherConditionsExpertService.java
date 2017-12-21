@@ -9,4 +9,8 @@ public interface WeatherConditionsExpertService {
 	String getWindBeaufortCategoryDescription(double windSpeed);
 	
 	String getTemperatureConditionsDescription(double temperature);
+	
+	String getWaterConditionsDescription(WindDirection beachFacingDirection, WindDirection windDirection);
+	
+	String getEquipmentSuggestion(double windSpeed);
 }

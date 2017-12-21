@@ -87,8 +87,13 @@ public class UpdatesScheduledTask {
 		meteoDataTOAndroid.setTemperatureConditionsDescription(
 				weatherconditionsExpertService.getTemperatureConditionsDescription(meteoData.getTemperature())
 				);
+		meteoDataTOAndroid.setWaterConditionsDescription(
+				weatherconditionsExpertService.getWaterConditionsDescription(station.getBeachFacingDirection(), meteoData.getWindDirection()
+				));
+		meteoDataTOAndroid.setEquipmentSuggestion(
+				weatherconditionsExpertService.getEquipmentSuggestion(meteoData.getWindSpeed())
+				);
 		return meteoDataTOAndroid;
-		
 	}
 	private Date convertLocalDateTimeToDate(LocalDateTime localDateTime) {
 		return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
