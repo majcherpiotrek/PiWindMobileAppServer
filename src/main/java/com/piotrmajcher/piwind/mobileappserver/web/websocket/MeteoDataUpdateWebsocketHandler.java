@@ -42,8 +42,7 @@ public class MeteoDataUpdateWebsocketHandler extends TextWebSocketHandler{
 		
 		MeteoDataUpdatePublishEventListener listener = createMeteoDataUpdateListenerForSession(session, stationId);
 		meteoDataUpdateApplicationListener.addMeteoDataUpdatePublishEventListener(listener);
-	}
-	
+	}	
 	private MeteoDataUpdatePublishEventListener createMeteoDataUpdateListenerForSession(WebSocketSession session,
 			UUID stationId) {
 		return new MeteoDataUpdatePublishEventListener() {
@@ -64,14 +63,12 @@ public class MeteoDataUpdateWebsocketHandler extends TextWebSocketHandler{
 					sessions.remove(session);
 				}
 			}
-			
 			@Override
 			public UUID getListeningStationId() {
 				return stationId;
 			}
 		};
 	}
-
 	@Override
 	public void afterConnectionEstablished(WebSocketSession session) throws Exception {
 		sessions.add(session);

@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
@@ -17,7 +16,6 @@ import com.piotrmajcher.piwind.mobileappserver.web.dto.MeteoDataTOAndroid;
 
 @Component
 public class MeteoDataUpdateApplicationListener implements ApplicationListener<OnMeteoDataUpdateReceivedEvent> {
-	private static final Logger logger = Logger.getLogger(MeteoDataUpdateApplicationListener.class);
 	private List<MeteoDataUpdatePublishEventListener> listeners;
 	private Map<UUID, MeteoDataTOAndroid> latestMeasurementsMap;
 	private AndroidPushNotificationsService androidPushNotificationService;
