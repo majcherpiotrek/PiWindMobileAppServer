@@ -1,4 +1,4 @@
 language: java
 jdk:
  - oraclejdk8
-script: gradle clean build -Dspring.profiles.active=development
+script: gradle clean -Dspring.profiles.active=development build
