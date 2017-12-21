@@ -208,7 +208,7 @@ public class UserServiceImpl implements UserService {
 	
 	private void retrievePassword(UserEntity user) throws RetrievePasswordException {
         if (user == null) {
-            throw new RetrievePasswordException("User with username \'" + user.getUsername() + "\' does not exist!");
+            throw new RetrievePasswordException("User does not exist!");
         }
 
         VerificationToken token = user.getToken();

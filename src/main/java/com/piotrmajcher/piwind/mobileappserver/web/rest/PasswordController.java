@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.piotrmajcher.piwind.mobileappserver.services.UserService;
 import com.piotrmajcher.piwind.mobileappserver.services.exceptions.RetrievePasswordException;
+import com.piotrmajcher.piwind.mobileappserver.web.dto.JsonResponseTO;
 import com.piotrmajcher.piwind.mobileappserver.web.dto.RetrievePasswordTO;
 
 @RestController
@@ -57,14 +58,17 @@ public class PasswordController {
 
     @PostMapping(value = "/retrieve/newpassword", consumes = MediaType.APPLICATION_JSON_VALUE)
     @CrossOrigin
-    public ResponseEntity<String> changeRetrievedPassword(@RequestBody RetrievePasswordTO retrievePasswordTO) {
-
+    public ResponseEntity<JsonResponseTO> changeRetrievedPassword(@RequestBody RetrievePasswordTO retrievePasswordTO) {
+    	
+    	JsonResponseTO response = new JsonResponseTO();
         try {
             userService.changeRetrievedPassword(retrievePasswordTO);
         } catch (RetrievePasswordException e) {
-            return new ResponseEntity<String>(e.getMessage(), HttpStatus.CONFLICT);
+        	response.setErr(e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.CONFLICT);
         }
-        return new ResponseEntity<>("Your password has been changed", HttpStatus.OK);
+        response.setMsg("Your password has been changed");
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 }
