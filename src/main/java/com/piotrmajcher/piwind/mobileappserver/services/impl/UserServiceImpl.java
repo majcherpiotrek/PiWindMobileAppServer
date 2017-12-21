@@ -213,6 +213,8 @@ public class UserServiceImpl implements UserService {
 
         VerificationToken token = user.getToken();
         if (token != null) {
+        	user.setToken(null);
+        	userRepository.save(user);
             verificationTokenRepository.delete(token);
         }
 
